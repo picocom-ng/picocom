@@ -6,7 +6,7 @@
  *
  * by Nick Patavalis (npat@efault.net)
  *
- * originaly by Pantelis Antoniou (https://github.com/pantoniou),
+ * originally by Pantelis Antoniou (https://github.com/pantoniou),
  *              Nick Patavalis
  *
  * Documentation can be found in the header file "term.h".
@@ -94,7 +94,7 @@ int term_errno;
 
 static const char * const term_err_str[] = {
     [TERM_EOK]        = "No error",
-    [TERM_ENOINIT]    = "Framework is uninitialized",
+    [TERM_ENOINIT]    = "Framework is uninitialised",
     [TERM_EFULL]      = "Framework is full",
     [TERM_ENOTFOUND]  = "Filedes not in the framework",
     [TERM_EEXISTS]    = "Filedes already in the framework",
@@ -413,10 +413,10 @@ term_exitfunc (void)
             /* Explicitly unlock the file. If the file is not in fact
                flock(2)'ed, no harm is done. This should normally not
                be necessary. Normally, exiting the program should take
-               care of unlocking the file. Unfortuntelly, it has been
+               care of unlocking the file. Unfortunately, it has been
                observed that, on some systems, exiting or closing an
                flock(2)'ed tty fd has peculiar side effects (like not
-               reseting the modem-control lines, even if HUPCL is
+               resetting the modem-control lines, even if HUPCL is
                set). */
             flock(term.fd[i], LOCK_UN);
 #endif
@@ -456,7 +456,7 @@ term_lib_init (void)
                 term.fd[i] = -1;
             }
         } else {
-            /* initialize term structure. */
+            /* initialise term structure. */
             for (i = 0; i < MAX_TERMS; i++)
                 term.fd[i] = -1;
             if ( atexit(term_exitfunc) != 0 ) {
@@ -464,7 +464,7 @@ term_lib_init (void)
                 rval = -1;
                 break;
             }
-            /* ok. term struct is now initialized. */
+            /* ok. term struct is now initialised. */
             term.init = 1;
         }
     } while(0);
@@ -742,9 +742,9 @@ term_apply (int fd, int now)
         term.currtermios[i] = term.nexttermios[i];
 
         /* Set HUPCL to origtermios as well. Since setting HUPCL
-           affects the behavior on close(2), we most likely want it to
+           affects the behaviour on close(2), we most likely want it to
            also apply when the filedes is implicitly closed by
-           exit(3)ing the program. Since, uppon exiting, we restore
+           exit(3)ing the program. Since, upon exiting, we restore
            the original settings, this wouldn't happen unless we also
            set HUPCL to origtermios. */
         if ( term.currtermios[i].c_cflag & HUPCL )
@@ -1613,7 +1613,7 @@ term_drain(int fd)
            systems and / or drivers corrupt the last character(s) if
            the port is immediately reconfigured, even after a
            drain. (I guess, drain does not wait for everything to
-           actually be transitted on the wire). */
+           actually be transmitted on the wire). */
         if ( DRAIN_DELAY ) usleep(DRAIN_DELAY);
 
     } while (0);
