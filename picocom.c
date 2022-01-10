@@ -87,13 +87,13 @@ const char *flow_str[] = {
 #define CKEY(c) ((c) & 0x1f)
 
 #define KEY_EXIT    CKEY('x') /* exit picocom */
-#define KEY_QUIT    CKEY('q') /* exit picocom without reseting port */
+#define KEY_QUIT    CKEY('q') /* exit picocom without resetting port */
 #define KEY_PULSE   CKEY('p') /* pulse DTR */
 #define KEY_TOG_DTR CKEY('t') /* toggle DTR */
 #define KEY_TOG_RTS CKEY('g') /* toggle RTS */
 #define KEY_BAUD    CKEY('b') /* set baudrate */
 #define KEY_BAUD_UP CKEY('u') /* increase baudrate (up) */
-#define KEY_BAUD_DN CKEY('d') /* decrase baudrate (down) */
+#define KEY_BAUD_DN CKEY('d') /* decrease baudrate (down) */
 #define KEY_FLOW    CKEY('f') /* change flowcntrl mode */
 #define KEY_PARITY  CKEY('y') /* change parity mode */
 #define KEY_BITS    CKEY('i') /* change number of databits */
@@ -109,7 +109,7 @@ const char *flow_str[] = {
 
 /**********************************************************************/
 
-/* implemented caracter mappings */
+/* implemented character mappings */
 #define M_CRLF    (1 << 0)  /* map CR  --> LF */
 #define M_CRCRLF  (1 << 1)  /* map CR  --> CR + LF */
 #define M_IGNCR   (1 << 2)  /* map CR  --> <nothing> */
@@ -123,7 +123,7 @@ const char *flow_str[] = {
 #define M_CRHEX   (1 << 10)  /* map CR --> hex */
 #define M_LFHEX   (1 << 11) /* map LF --> hex */
 #define M_8BITHEX (1 << 12) /* map 8-bit chars --> hex */
-#define M_NRMHEX  (1 << 13) /* map normal ascii chars --> hex */
+#define M_NRMHEX  (1 << 13) /* map normal ASCII chars --> hex */
 #define M_NFLAGS 14
 
 /* default character mappings */
@@ -672,10 +672,10 @@ cleanup (int drain, int noreset, int hup)
            it's output buffers *and* flow-control is enabled we may
            block forever. So we "fake" a flush, by temporarily setting
            f/c to none, waiting for any data in the output buffer to
-           drain, and then reseting f/c to it's original setting. If
+           drain, and then resetting f/c to it's original setting. If
            the real flush above does works, then the fake one should
            amount to instantaneously switching f/c to none and then
-           back to its propper setting. */
+           back to its proper setting. */
         if ( opts.flow != FC_NONE ) term_fake_flush(tty_fd);
         term_set_hupcl(tty_fd, !noreset || hup);
         term_apply(tty_fd, 1);
@@ -731,7 +731,7 @@ fatal (const char *format, ...)
 
 /**********************************************************************/
 
-/* maximum number of chars that can replace a single characted
+/* maximum number of chars that can replace a single character
    due to mapping */
 #define M_MAXMAP 4
 
@@ -754,13 +754,13 @@ do_map (char *b, int map, char c)
 
     switch (c) {
     case '\x7f':
-        /* DEL mapings */
+        /* DEL mappings */
         if ( map & M_DELBS ) {
             b[0] = '\x08'; n = 1;
         }
         break;
     case '\x08':
-        /* BS mapings */
+        /* BS ma-pings */
         if ( map & M_BSDEL ) {
             b[0] = '\x7f'; n = 1;
         }
@@ -1019,7 +1019,7 @@ show_keys()
     fd_printf(STO, "\r\n");
     fd_printf(STO, "*** [C-%c] : Exit picocom\r\n",
               KEYC(KEY_EXIT));
-    fd_printf(STO, "*** [C-%c] : Exit without reseting serial port\r\n",
+    fd_printf(STO, "*** [C-%c] : Exit without resetting serial port\r\n",
               KEYC(KEY_QUIT));
     fd_printf(STO, "*** [C-%c] : Set baudrate\r\n",
               KEYC(KEY_BAUD));
@@ -1170,7 +1170,7 @@ run_cmd(int fd, const char *cmd, const char *args_extra)
         }
         argv[argc] = NULL;
 
-        /* run extenral command */
+        /* run external command */
         fd_printf(STE, "$ %s %s\n", cmd, args_extra);
         establish_child_signal_handlers();
         sigprocmask(SIG_SETMASK, &sigm_old, NULL);
@@ -1471,7 +1471,7 @@ loop(void)
                 pinfo("\r\n** read zero bytes from stdin **\r\n");
                 goto skip_proc_STI;
             } else if (n < 0) {
-                /* is this really necessary? better safe than sory! */
+                /* is this really necessary? better safe than sorry! */
                 if ( errno != EAGAIN && errno != EWOULDBLOCK )
                     fatal("read from stdin failed: %s", strerror(errno));
                 else
@@ -1677,7 +1677,7 @@ show_usage(char *name)
     printf("  crhex : map CR --> hex\n");
     printf("  lfhex : map LF --> hex\n");
     printf("  8bithex : map 8-bit chars --> hex\n");
-    printf("  nrmhex : map normal ascii chars --> hex\n");
+    printf("  nrmhex : map normal ASCII chars --> hex\n");
     printf("<?> indicates the equivalent short option.\n");
     printf("Short options are prefixed by \"-\" instead of by \"--\".\n");
 #else /* defined NO_HELP */
@@ -1906,7 +1906,7 @@ parse_args(int argc, char *argv[])
         case 'x':
             opts.exit_after = strtol(optarg, &ep, 10);
             if ( ! ep || *ep != '\0' || opts.exit_after < 0 ) {
-                fprintf(stderr, "Inavild --exit-after: %s\n", optarg);
+                fprintf(stderr, "Invalid --exit-after: %s\n", optarg);
                 r = -1;
                 break;
             }
@@ -1922,7 +1922,7 @@ parse_args(int argc, char *argv[])
             exit(EXIT_SUCCESS);
         case '?':
         default:
-            fprintf(stderr, "Unrecognized option(s)\n");
+            fprintf(stderr, "Unrecognised option(s)\n");
             r = -1;
             break;
         }
@@ -2037,7 +2037,7 @@ set_dtr_rts (void)
                   term_strerror(term_errno, errno));
         dtr_up = 1;
     }
-    /* Try to read the status of the modem-conrtol lines from the
+    /* Try to read the status of the modem-control lines from the
        port. */
     r = term_get_mctl(tty_fd);
     if ( r >= 0 && r != MCTL_UNAVAIL ) {

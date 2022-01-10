@@ -88,7 +88,7 @@ split_quoted (const char *s, int *argc, char *argv[], int argv_sz)
 {
     char arg_buff[MAX_ARG_LEN]; /* current argument buffer */
     char *ap, *ae;              /* arg_buff current ptr & end-guard */
-    const char *c;              /* current input charcter ptr */
+    const char *c;              /* current input character ptr */
     char qc;                    /* current quote character */
     enum states state;          /* current state */
     enum err_codes err;         /* error end-code */
@@ -100,7 +100,7 @@ split_quoted (const char *s, int *argc, char *argv[], int argv_sz)
     state = ST_DELIM;
     err = ERR_OK;
     flags = 0;
-    qc = SQ; /* silence compiler waring */
+    qc = SQ; /* silence compiler warning */
 
     while ( state != ST_END ) {
         switch (state) {
