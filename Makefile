@@ -70,7 +70,7 @@ doc : picocom.1.html picocom.1 picocom.1.pdf
 picocom.1 : picocom.1.md
 	sed 's/\*\*\[/\*\*/g;s/\]\*\*/\*\*/g' $? \
 	| pandoc -s -t man \
-	    -Vfooter="Picocom $(VERSION)" -Vdate="`date -I`" \
+	    -Vfooter="Picocom $(VERSION)" \
 	    -Vadjusting='l' \
 	    -Vhyphenate='' \
 	    -o $@
