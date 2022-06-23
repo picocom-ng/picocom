@@ -153,7 +153,7 @@ message:
 From now on, every character you type is sent to the serial port, and
 every character received from the serial port is sent to your
 terminal.  Including control and special characters. Assuming that
-there is nothing connected to the other end of your serial port, to
+there is nothing connected to the other end of your serial port to
 respond to the characters you send to it (e.g. echo them back to you),
 then nothing that you type in picocom will appear on your
 terminal. This is normal.
@@ -183,7 +183,7 @@ or (assuming you have installed the manual page to a suitable place):
 
     man picocom
 
-Thanks for using picocom
+Thanks for using picocom!
 
 ## Custom Bash completion
 
