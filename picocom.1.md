@@ -119,7 +119,7 @@ here.
     `HIGH_BAUD` support is compiled-in, then the following baud-rates
     are also added to the list: 230400, 460800, 500000, 576000,
     921600, 1000000, 1152000, 1500000, 2000000, 2500000, 3000000,
-    3500000, 4000000. Depending on you system, any of the higher baud
+    3500000, 4000000. Depending on your system, any of the higher baud
     rates may be missing.
 
 **C-d**
