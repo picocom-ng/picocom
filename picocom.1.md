@@ -52,7 +52,7 @@ below.
 
 # COMMANDS
 
-Commands are given to picocom by first keying the *espace character*
+Commands are given to picocom by first keying the *escape character*
 which by default is **C-a** (see **[OPTIONS]** below for how to change
 it), and then keying one of the function (command) characters shown
 here.
@@ -436,7 +436,7 @@ Picocom accepts the following command-line options.
      options are observed as usual. With **--exit** and **--noreset**
      (and possibly **--hangup**) picocom can be used as a very crude
      replacement of **stty(1)**. If an init string is also given (see
-     **--initstring** option), picocom exits imediatelly after sending
+     **--initstring** option), picocom exits immediately after sending
      (writing) the init string to the serial port and draining the O/S
      serial port output buffer (i.e. waiting for data written to the
      port to be transmitted). Again, nothing is read from the standard
