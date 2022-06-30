@@ -184,7 +184,7 @@ print_map (int flags)
     for (i = 0; i < M_NFLAGS; i++)
         if ( flags & (1 << i) )
             printf("%s,", map_names[i].name);
-    printf("\n");
+    printf("\r\n");
 }
 
 /**********************************************************************/
@@ -1951,47 +1951,47 @@ parse_args(int argc, char *argv[])
         return;
 
 #ifndef NO_HELP
-    printf("picocom v%s\n", VERSION_STR);
-    printf("\n");
-    printf("port is        : %s\n", opts.port);
-    printf("flowcontrol    : %s\n", flow_str[opts.flow]);
-    printf("baudrate is    : %d\n", opts.baud);
-    printf("parity is      : %s\n", parity_str[opts.parity]);
-    printf("databits are   : %d\n", opts.databits);
-    printf("stopbits are   : %d\n", opts.stopbits);
+    printf("picocom v%s\r\n", VERSION_STR);
+    printf("\r\n");
+    printf("port is        : %s\r\n", opts.port);
+    printf("flowcontrol    : %s\r\n", flow_str[opts.flow]);
+    printf("baudrate is    : %d\r\n", opts.baud);
+    printf("parity is      : %s\r\n", parity_str[opts.parity]);
+    printf("databits are   : %d\r\n", opts.databits);
+    printf("stopbits are   : %d\r\n", opts.stopbits);
     if ( opts.noescape ) {
-        printf("escape is      : none\n");
+        printf("escape is      : none\r\n");
     } else {
-        printf("escape is      : C-%c\n", KEYC(opts.escape));
+        printf("escape is      : C-%c\r\n", KEYC(opts.escape));
     }
-    printf("local echo is  : %s\n", opts.lecho ? "yes" : "no");
-    printf("noinit is      : %s\n", opts.noinit ? "yes" : "no");
-    printf("noreset is     : %s\n", opts.noreset ? "yes" : "no");
-    printf("hangup is      : %s\n", opts.hangup ? "yes" : "no");
+    printf("local echo is  : %s\r\n", opts.lecho ? "yes" : "no");
+    printf("noinit is      : %s\r\n", opts.noinit ? "yes" : "no");
+    printf("noreset is     : %s\r\n", opts.noreset ? "yes" : "no");
+    printf("hangup is      : %s\r\n", opts.hangup ? "yes" : "no");
 #if defined (UUCP_LOCK_DIR) || defined (USE_FLOCK)
-    printf("nolock is      : %s\n", opts.nolock ? "yes" : "no");
+    printf("nolock is      : %s\r\n", opts.nolock ? "yes" : "no");
 #endif
-    printf("send_cmd is    : %s\n",
+    printf("send_cmd is    : %s\r\n",
            (opts.send_cmd[0] == '\0') ? "disabled" : opts.send_cmd);
-    printf("receive_cmd is : %s\n",
+    printf("receive_cmd is : %s\r\n",
            (opts.receive_cmd[0] == '\0') ? "disabled" : opts.receive_cmd);
     printf("imap is        : "); print_map(opts.imap);
     printf("omap is        : "); print_map(opts.omap);
     printf("emap is        : "); print_map(opts.emap);
-    printf("logfile is     : %s\n", opts.log_filename ? opts.log_filename : "none");
+    printf("logfile is     : %s\r\n", opts.log_filename ? opts.log_filename : "none");
     if ( opts.initstring ) {
-        printf("initstring len : %lu bytes\n",
+        printf("initstring len : %lu bytes\r\n",
                (unsigned long)strlen(opts.initstring));
     } else {
-        printf("initstring     : none\n");
+        printf("initstring     : none\r\n");
     }
     if (opts.exit_after < 0) {
-        printf("exit_after is  : not set\n");
+        printf("exit_after is  : not set\r\n");
     } else {
-        printf("exit_after is  : %d ms\n", opts.exit_after);
+        printf("exit_after is  : %d ms\r\n", opts.exit_after);
     }
-    printf("exit is        : %s\n", opts.exit ? "yes" : "no");
-    printf("\n");
+    printf("exit is        : %s\r\n", opts.exit ? "yes" : "no");
+    printf("\r\n");
     fflush(stdout);
 #endif /* of NO_HELP */
 }
