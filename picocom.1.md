@@ -41,21 +41,22 @@ the tty to raw mode. Then it goes in a loop where it listens for input
 from stdin, or from the serial port. Input from the serial port is
 copied to the standard output while input from the standard input is
 copied to the serial port. Picocom also scans its input stream for a
-user-specified control character, called the _escape character_ (being
-by default **C-a**). If the escape character is seen, then instead of
-sending it to the serial-device, the program enters "command mode" and
-waits for the next character (which is called the "function
-character"). Depending on the value of the function character, picocom
-performs one of the operations described in the **[COMMANDS]** section
-below.
+user-specified control character, called the _escape character_. If
+the escape character is seen, then instead of sending it to the
+serial-device, the program enters "command mode" and waits for the
+next character (which is called the "function character"). Depending
+on the value of the function character, picocom performs one of the
+operations described in the **[COMMANDS]** section below.
 
 
 # COMMANDS
 
 Commands are given to picocom by first keying the *escape character*
-which by default is **C-a** (see **[OPTIONS]** below for how to change
-it), and then keying one of the function (command) characters shown
-here.
+which by default is **Control-a** (see **[OPTIONS]** below for how to
+change it), and then keying one of the function (command) characters
+shown here. From now on, we will use **C-\<key\>** as a short version
+of **Control-\<key\>**, so the default escape character is then
+**C-a**.
 
 *escape character*
 
