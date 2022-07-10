@@ -1,5 +1,5 @@
 <!-- Creator     : groff version 1.22.4 -->
-<!-- CreationDate: Tue Jun 28 20:18:30 2022 -->
+<!-- CreationDate: Sun Jul 10 20:58:30 2022 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -25,6 +25,7 @@
 <a href="#DESCRIPTION">DESCRIPTION</a><br>
 <a href="#COMMANDS">COMMANDS</a><br>
 <a href="#OPTIONS">OPTIONS</a><br>
+<a href="#CHANGING DEFAULT OPTIONS">CHANGING DEFAULT OPTIONS</a><br>
 <a href="#DISPLAY OF OPTIONS AND PORT SETTINGS">DISPLAY OF OPTIONS AND PORT SETTINGS</a><br>
 <a href="#SENDING AND RECEIVING FILES">SENDING AND RECEIVING FILES</a><br>
 <a href="#INPUT, OUTPUT, AND ECHO MAPPING">INPUT, OUTPUT, AND ECHO MAPPING</a><br>
@@ -91,14 +92,14 @@ from stdin, or from the serial port. Input from the serial
 port is copied to the standard output while input from the
 standard input is copied to the serial port. Picocom also
 scans its input stream for a user-specified control
-character, called the <i>escape character</i> (being by
-default <b>C-a</b>). If the escape character is seen, then
-instead of sending it to the serial-device, the program
-enters &ldquo;command mode&rdquo; and waits for the next
-character (which is called the &ldquo;function
-character&rdquo;). Depending on the value of the function
-character, picocom performs one of the operations described
-in the <b>COMMANDS</b> section below.</p>
+character, called the <i>escape character</i>. If the escape
+character is seen, then instead of sending it to the
+serial-device, the program enters &ldquo;command mode&rdquo;
+and waits for the next character (which is called the
+&ldquo;function character&rdquo;). Depending on the value of
+the function character, picocom performs one of the
+operations described in the <b>COMMANDS</b> section
+below.</p>
 
 <h2>COMMANDS
 <a name="COMMANDS"></a>
@@ -107,9 +108,12 @@ in the <b>COMMANDS</b> section below.</p>
 
 <p style="margin-left:11%; margin-top: 1em">Commands are
 given to picocom by first keying the <i>escape character</i>
-which by default is <b>C-a</b> (see <b>OPTIONS</b> below for
-how to change it), and then keying one of the function
-(command) characters shown here. <i><br>
+which by default is <b>Control-a</b> (see <b>OPTIONS</b>
+below for how to change it), and then keying one of the
+function (command) characters shown here. From now on, we
+will use <b>C-&lt;key&gt;</b> as a short version of
+<b>Control-&lt;key&gt;</b>, so the default escape character
+is then <b>C-a</b>. <i><br>
 escape character</i></p>
 
 <p style="margin-left:22%;">Send the escape character to
@@ -761,6 +765,18 @@ printed.</p>
 describing the command-line options. Picocom&rsquo;s
 version, compile-time options, and enabled features are also
 shown.</p>
+
+<h2>CHANGING DEFAULT OPTIONS
+<a name="CHANGING DEFAULT OPTIONS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Picocom does
+not support config files. If you want to change default
+options, use either a custom script or aliases, e.g.:</p>
+
+<pre style="margin-left:22%; margin-top: 1em">  alias picocom='picocom -b 115200 /dev/ttyS0'</pre>
+
 
 <h2>DISPLAY OF OPTIONS AND PORT SETTINGS
 <a name="DISPLAY OF OPTIONS AND PORT SETTINGS"></a>

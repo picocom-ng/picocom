@@ -42,8 +42,7 @@ the serial port.
 Input from the serial port is copied to the standard output while input
 from the standard input is copied to the serial port.
 Picocom also scans its input stream for a user-specified control
-character, called the \f[I]escape character\f[R] (being by default
-\f[B]C-a\f[R]).
+character, called the \f[I]escape character\f[R].
 If the escape character is seen, then instead of sending it to the
 serial-device, the program enters \[lq]command mode\[rq] and waits for
 the next character (which is called the \[lq]function character\[rq]).
@@ -52,9 +51,12 @@ of the operations described in the \f[B]COMMANDS\f[R] section below.
 .SH COMMANDS
 .PP
 Commands are given to picocom by first keying the \f[I]escape
-character\f[R] which by default is \f[B]C-a\f[R] (see \f[B]OPTIONS\f[R]
-below for how to change it), and then keying one of the function
-(command) characters shown here.
+character\f[R] which by default is \f[B]Control-a\f[R] (see
+\f[B]OPTIONS\f[R] below for how to change it), and then keying one of
+the function (command) characters shown here.
+From now on, we will use \f[B]C-<key>\f[R] as a short version of
+\f[B]Control-<key>\f[R], so the default escape character is then
+\f[B]C-a\f[R].
 .TP
 \f[I]escape character\f[R]
 Send the escape character to the serial port and return to
@@ -487,6 +489,17 @@ printed.
 Print a short help message describing the command-line options.
 Picocom\[cq]s version, compile-time options, and enabled features are
 also shown.
+.SH CHANGING DEFAULT OPTIONS
+.PP
+Picocom does not support config files.
+If you want to change default options, use either a custom script or
+aliases, e.g.:
+.IP
+.nf
+\f[C]
+  alias picocom=\[aq]picocom -b 115200 /dev/ttyS0\[aq]
+\f[R]
+.fi
 .SH DISPLAY OF OPTIONS AND PORT SETTINGS
 .PP
 The \[lq]show program options\[rq] command (\f[B]C-v\f[R]), as well as
