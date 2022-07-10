@@ -457,6 +457,14 @@ Picocom accepts the following command-line options.
     features are also shown.
 
 
+# CHANGING DEFAULT OPTIONS
+
+Picocom does not support config files. If you want to change default
+options, use either a custom script or aliases, e.g.:
+
+      alias picocom='picocom -b 115200 /dev/ttyS0'
+
+
 # DISPLAY OF OPTIONS AND PORT SETTINGS
 
 The "show program options" command (**C-v**), as well as the commands
