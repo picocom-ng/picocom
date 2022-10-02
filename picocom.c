@@ -37,6 +37,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <limits.h>
+#include <time.h>
 #ifdef USE_FLOCK
 #include <sys/file.h>
 #endif
@@ -219,6 +220,7 @@ struct {
     int raise_rts;
     int raise_dtr;
     int quiet;
+    struct timespec txdelay;
 } opts = {
     .port = NULL,
     .baud = 9600,
@@ -248,7 +250,8 @@ struct {
     .lower_dtr = 0,
     .raise_rts = 0,
     .raise_dtr = 0,
-    .quiet = 0
+    .quiet = 0,
+    .txdelay = { 0, 0 },
 };
 
 int sig_exit = 0;
@@ -1543,7 +1546,12 @@ loop(void)
             int sz;
             sz = (tty_q.len < tty_write_sz) ? tty_q.len : tty_write_sz;
             do {
-                n = write(tty_fd, tty_q.buff, sz);
+                if (opts.txdelay.tv_nsec) {
+                    n = write(tty_fd, tty_q.buff, 1);
+                    nanosleep(&opts.txdelay, NULL);
+                } else {
+                    n = write(tty_fd, tty_q.buff, sz);
+                }
             } while ( n < 0 && errno == EINTR );
             if ( n <= 0 )
                 fatal("write to port failed: %s", strerror(errno));
@@ -1637,6 +1645,7 @@ show_usage(char *name)
     printf("  --parit<y> o (=odd) | e (=even) | n (=none)\n");
     printf("  --<d>atabits 5 | 6 | 7 | 8\n");
     printf("  --sto<p>bits 1 | 2\n");
+    printf("  --<T>xdelay <nsec>\n");
     printf("  --<e>scape <char>\n");
     printf("  --<n>o-escape\n");
     printf("  --e<c>ho\n");
@@ -1716,6 +1725,7 @@ parse_args(int argc, char *argv[])
         {"lower-dtr", no_argument, 0, 2},
         {"raise-rts", no_argument, 0, 3},
         {"raise-dtr", no_argument, 0, 4},
+        {"tx-delay", required_argument, 0, 'T'},
         {"quiet", no_argument, 0, 'q'},
         {"help", no_argument, 0, 'h'},
         {0, 0, 0, 0}
@@ -1731,7 +1741,7 @@ parse_args(int argc, char *argv[])
         /* no default error messages printed. */
         opterr = 0;
 
-        c = getopt_long(argc, argv, "hirulcqXnv:s:r:e:f:b:y:d:p:g:t:x:",
+        c = getopt_long(argc, argv, "hirulcqXnv:s:r:e:f:b:y:d:p:g:t:x:T:",
                         longOptions, &optionIndex);
 
         if (c < 0)
@@ -1895,6 +1905,15 @@ parse_args(int argc, char *argv[])
         case 4:
             opts.raise_dtr = 1;
             break;
+        case 'T':
+            opts.txdelay.tv_nsec = strtol(optarg, &ep, 10);
+
+            /* Limit to 1 second */
+            if (!ep || *ep != '\0' || opts.txdelay.tv_nsec < 0 || opts.txdelay.tv_nsec >= 1000000000) {
+                fprintf(stderr, "Inavild --tx-delay (must be between 0 and 999999999): %s\n", optarg);
+                r = -1;
+            }
+            break;
         case 'x':
             opts.exit_after = strtol(optarg, &ep, 10);
             if ( ! ep || *ep != '\0' || opts.exit_after < 0 ) {
@@ -1962,6 +1981,7 @@ parse_args(int argc, char *argv[])
     printf("parity is      : %s\r\n", parity_str[opts.parity]);
     printf("databits are   : %d\r\n", opts.databits);
     printf("stopbits are   : %d\r\n", opts.stopbits);
+    printf("txdelay is     : %ld ns\r\n", opts.txdelay.tv_nsec);
     if ( opts.noescape ) {
         printf("escape is      : none\r\n");
     } else {
