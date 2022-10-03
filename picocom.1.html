@@ -1,5 +1,5 @@
 <!-- Creator     : groff version 1.22.4 -->
-<!-- CreationDate: Sun Jul 10 20:58:30 2022 -->
+<!-- CreationDate: Mon Oct  3 15:02:30 2022 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -443,6 +443,17 @@ in every character. Must be one of: <b>5</b>, <b>6</b>,
 <p style="margin-left:22%;">Defines the number of stop bits
 in every character. Must be one of: <b>1</b>, or <b>2</b>.
 (Default: <b>1</b>)</p>
+
+<p style="margin-left:11%;"><b>&ndash;tx-delay</b> |
+<b>-T</b></p>
+
+<p style="margin-left:22%;">Delays for the specified amount
+of time (in nanonseconds) after each character sent. If you
+do not use any flow-control, this can help to prevent lost
+characters due to buffer overruns when sending larger blocks
+of data, e.g.&nbsp;when pasting text. Allowed range is from
+<b>0</b> (disabling the feature) to <b>999999999</b> (nearly
+1 second). (Default: <b>0</b>)</p>
 
 <p style="margin-left:11%;"><b>&ndash;escape</b> |
 <b>-e</b></p>

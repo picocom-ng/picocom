@@ -224,6 +224,16 @@ Defines the number of stop bits in every character.
 Must be one of: \f[B]1\f[R], or \f[B]2\f[R].
 (Default: \f[B]1\f[R])
 .TP
+\f[B]\[en]tx-delay\f[R] | \f[B]-T\f[R]
+Delays for the specified amount of time (in nanonseconds) after each
+character sent.
+If you do not use any flow-control, this can help to prevent lost
+characters due to buffer overruns when sending larger blocks of data,
+e.g.\ when pasting text.
+Allowed range is from \f[B]0\f[R] (disabling the feature) to
+\f[B]999999999\f[R] (nearly 1 second).
+(Default: \f[B]0\f[R])
+.TP
 \f[B]\[en]escape\f[R] | \f[B]-e\f[R]
 Defines the character that will make picocom enter command-mode (see
 description above).
