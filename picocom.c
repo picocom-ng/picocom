@@ -1914,7 +1914,10 @@ parse_args(int argc, char *argv[])
             exit(EXIT_SUCCESS);
         case '?':
         default:
-            fprintf(stderr, "Unrecognized option(s)\n");
+            if (optopt)
+                fprintf(stderr, "Unrecognized option '-%c'\n", optopt);
+            else
+                fprintf(stderr, "Unrecognized option '%s'\n", argv[optind - 1]);
             r = -1;
             break;
         }
