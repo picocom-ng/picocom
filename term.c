@@ -760,6 +760,22 @@ term_apply (int fd, int now)
 
 /***************************************************************************/
 
+#ifdef __sun
+void
+cfmakeraw(struct termios *tio)
+{
+    tio->c_iflag &= ~(IMAXBEL | IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR |
+        IGNCR | ICRNL | IXON);
+    tio->c_oflag &= ~OPOST;
+    tio->c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+    tio->c_cflag &= ~(CSIZE | PARENB);
+    tio->c_cflag |= CS8;
+
+    tio->c_cc[VMIN] = 1;
+    tio->c_cc[VTIME] = 0;
+}
+#endif
+
 int
 term_set_raw (int fd)
 {
