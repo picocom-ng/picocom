@@ -2224,6 +2224,9 @@ main (int argc, char *argv[])
     } else
         pinfo("Thanks for using picocom\r\n");
 
+    if ( opts.quiet )
+        fd_printf(STO, "\r\n");
+
     return xcode;
 }
 
