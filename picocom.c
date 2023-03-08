@@ -1910,7 +1910,7 @@ parse_args(int argc, char *argv[])
 
             /* Limit to 1 second */
             if (!ep || *ep != '\0' || opts.txdelay.tv_nsec < 0 || opts.txdelay.tv_nsec >= 1000000000) {
-                fprintf(stderr, "Inavild --tx-delay (must be between 0 and 999999999): %s\n", optarg);
+                fprintf(stderr, "Invalid --tx-delay (must be between 0 and 999999999): %s\n", optarg);
                 r = -1;
             }
             break;
