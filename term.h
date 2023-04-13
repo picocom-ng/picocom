@@ -93,8 +93,6 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- *
- * $Id: term.h,v 1.1 2003/05/07 18:00:05 npat Exp $
  */
 
 
