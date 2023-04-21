@@ -619,19 +619,19 @@ int
 read_hex (unsigned char *buff, int sz)
 {
     char *hexstr;
-    int n;
+    int n = 0;
 
     do {
         fd_printf(STO, "\r\n");
         hexstr = linenoise("*** hex: ");
         fd_printf(STO, "\r");
-        if ( hexstr == NULL ) {
-            n = 0;
+        if ( hexstr == NULL )
             break;
-        }
         n = hex2bin(buff, sz, hexstr);
         if ( n < 0 )
             fd_printf(STO, "*** Invalid hex!");
+        else if (n > 0)
+            add_history(hexstr);
         free(hexstr);
     } while (n < 0);
 
