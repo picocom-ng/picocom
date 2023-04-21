@@ -678,13 +678,14 @@ operation and what happens in each such condition:
 
 # AUTHOR
 
-Written by Nick Patavalis <npat@efault.net>
+Written by Nick Patavalis <npat@efault.net>, currently maintained by Wolfram
+Sang <wsa@kernel.org>
 
 
 # AVAILABILITY
 
 Download the latest release from:
-<https://github.com/npat-efault/picocom/releases>
+<https://gitlab.com/wsakernel/picocom/-/releases>
 
 
 # COPYRIGHT

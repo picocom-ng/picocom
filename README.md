@@ -1,11 +1,12 @@
 # picocom
 Minimal dumb-terminal emulator
 
-by Nick Patavalis (npat@efault.net)
+by Nick Patavalis (npat@efault.net), currently maintained by Wolfram Sang
+(wsa@kernel.org)
 
 The latest release can be downloaded from:
 
-> https://github.com/npat-efault/picocom/releases
+> https://gitlab.com/wsakernel/picocom/-/releases
 
 As its name suggests, *picocom* is a minimal dumb-terminal emulation
 program. It is, in principle, very much like minicom, only it's "pico"
@@ -34,8 +35,10 @@ implementations, bug-fixes, corrections, and suggestions are listed in
 the "CONTRIBUTORS" file.
 
 Please feel free to send comments, requests for new features (no
-promises, though!), bug-fixes and rants, to the author's email
-address shown at the top of this file.
+promises, though!), bug-fixes and rants, to the Gitlab repository at:
+
+> https://gitlab.com/wsakernel/picocom
+
 
 ## Compilation / Installation
 
