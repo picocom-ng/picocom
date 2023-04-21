@@ -606,12 +606,11 @@ read_baud (void)
         if ( ! ep || *ep != '\0' || ! term_baud_ok(baud) || baud == 0 ) {
             fd_printf(STO, "*** Invalid baudrate!");
             baud = -1;
+        } else {
+            add_history(baudstr);
         }
         free(baudstr);
     } while (baud < 0);
-
-    if (baudstr != NULL)
-        add_history(baudstr);
 
     return baud;
 }
