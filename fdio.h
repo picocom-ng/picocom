@@ -19,6 +19,9 @@
 
 #ifndef FDIO_H
 
+#include <stdlib.h>
+#include <stdarg.h>
+
 ssize_t writen_ni(int fd, const void *buff, size_t n);
 
 int fd_vprintf (int fd, const char *format, va_list ap);

@@ -454,6 +454,59 @@ Picocom accepts the following command-line options.
     options. Picocom's version, compile-time options, and enabled
     features are also shown.
 
+# CONFIGURATION FILE
+
+Picocom will look for a configuration file named `.picocom.conf` in
+the current directory and all parent directories (this allows you to
+create per-project configuration files). If it does not find
+one, it will look for a configuration file in the default location,
+`${XDG_CONFIG_HOME}/picocom/picocom.conf` (or
+`${HOME}/.config/picocom/picocom.conf` if `$XDG_CONFIG_HOME` is not
+defined). If the environment variable `$PICOCOM_CONFIG_FILE` is set,
+Picocom will use that file exclusively and will not look for
+configuration files in other locations.
+
+Configuration options generally follow the command line options:
+
+- `baud` -- an integer
+- `databits` -- an integer
+- `dtr` -- `none` (default), `raise`, or `lower`
+- `echo` -- `true` or `false`
+- `escape` -- a character
+- `flow` -- `none` (default), `hard` (or `rtscts`), `soft` (or `xonxoff`)
+- `hangup` -- `true` or `false`
+- `initstring` -- a string
+- `logfile` -- a string
+- `noinit` -- `true` or `false`
+- `nolock` -- `true` or `false`
+- `noreset` -- `true` or `false`
+- `parity` -- `none`, `even`, `odd`, `mark`, or `space`
+- `quiet` -- `true` or `false`
+- `receive-cmd` -- a string
+- `rts` -- `none` (default), `raise`, or `lower`
+- `send-cmd` -- a string
+- `stopbits` -- an integer
+- `tx-delay` -- an integer
+
+The map options use a slightly different syntax for specifying map names:
+
+- `emap` -- a comma-delimited list of map names enclosed in braces (`{crcrlf, delbs, spchex}`)
+- `imap` -- a comma-delimited list of map names enclosed in braces (`{crcrlf, delbs, spchex}`)
+- `omap` -- a comma-delimited list of map names enclosed in braces (`{crcrlf, delbs, spchex}`)
+
+Additionally, you can set the serial port in the configuration file:
+
+- `port` -- a path to a serial device
+
+## Example configuration file
+
+```
+port = /dev/ttyUSB1
+baud = 57600
+imap = { crcrlf, delbs }
+echo = true
+initstring = "ati4\r\n"
+```
 
 # DISPLAY OF OPTIONS AND PORT SETTINGS
 

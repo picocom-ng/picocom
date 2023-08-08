@@ -2,6 +2,10 @@
 ## FEATURE SELECTION
 ##
 
+# Set this to 0 to disable config file support. Building with configuration
+# file support requires libconfuse (https://github.com/libconfuse/libconfuse).
+FEATURE_CONFIGFILE ?= 1
+
 # Set this to 0 to disable high baudrate support
 FEATURE_HIGH_BAUD ?= 1
 
@@ -32,6 +36,12 @@ SRCS = picocom.c term.c fdio.c split.c custbaud.c termios2.c custbaud_bsd.c
 ## queue is allowed to grow to. Zero means unlimitted.
 TTY_Q_SZ = 0
 CPPFLAGS += -DTTY_Q_SZ=$(TTY_Q_SZ)
+
+ifeq ($(FEATURE_CONFIGFILE), 1)
+CPPFLAGS += -DCONFIGFILE
+LDLIBS += -lconfuse
+SRCS += configfile.c
+endif
 
 ifeq ($(FEATURE_HIGH_BAUD),1)
 CPPFLAGS += -DHIGH_BAUD

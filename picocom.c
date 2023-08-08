@@ -44,15 +44,15 @@
 #define _GNU_SOURCE
 #include <getopt.h>
 
-#include "fdio.h"
-#include "split.h"
-#include "term.h"
 #include "picocom.h"
+
 #ifdef LINENOISE
 #include "linenoise-1.0/linenoise.h"
 #endif
 
-#include "custbaud.h"
+#ifdef CONFIGFILE
+#include "configfile.h"
+#endif
 
 /**********************************************************************/
 
@@ -75,13 +75,6 @@ const char *flow_str[] = {
     [FC_ERROR] = "invalid flow control mode",
 };
 
-/**********************************************************************/
-
-#define RTS_DTR_NONE 0
-#define RTS_DTR_RAISE 1
-#define RTS_DTR_LOWER 2
-#define RTS_DTR_ERROR 3
-
 const char *rts_dtr_str[] = {
     [RTS_DTR_NONE] = "none",
     [RTS_DTR_RAISE] = "raise",
@@ -89,15 +82,34 @@ const char *rts_dtr_str[] = {
     [RTS_DTR_ERROR] = "invalid raise/lower setting",
 };
 
+/* character mapping names */
+#ifdef CONFIGFILE
+cfg_value_map valid_map_values[] = {
+#else
+struct { const char *name; int value; } valid_map_values[] = {
+#endif
+    { "crlf", M_CRLF },
+    { "crcrlf", M_CRCRLF },
+    { "igncr", M_IGNCR },
+    { "lfcr", M_LFCR },
+    { "lfcrlf", M_LFCRLF },
+    { "ignlf", M_IGNLF },
+    { "delbs", M_DELBS },
+    { "bsdel", M_BSDEL },
+    { "spchex", M_SPCHEX },
+    { "tabhex", M_TABHEX },
+    { "crhex", M_CRHEX },
+    { "lfhex", M_LFHEX },
+    { "8bithex", M_8BITHEX },
+    { "nrmhex", M_NRMHEX },
+    /* Sentinel */
+    { NULL, 0 }
+};
+
 /**********************************************************************/
 
 #define DEFAULT_SEND_CMD "sz -vv"
 #define DEFAULT_RECEIVE_CMD "rz -vv -E"
-
-/* control-key to printable character (lowcase) */
-#define KEYC(k) ((k) | 0x60)
-/* printable character to control-key */
-#define CKEY(c) ((c) & 0x1f)
 
 #define KEY_EXIT    CKEY('x') /* exit picocom */
 #define KEY_QUIT    CKEY('q') /* exit picocom without resetting port */
@@ -122,51 +134,6 @@ const char *rts_dtr_str[] = {
 
 /**********************************************************************/
 
-/* implemented character mappings */
-#define M_CRLF    (1 << 0)  /* map CR  --> LF */
-#define M_CRCRLF  (1 << 1)  /* map CR  --> CR + LF */
-#define M_IGNCR   (1 << 2)  /* map CR  --> <nothing> */
-#define M_LFCR    (1 << 3)  /* map LF  --> CR */
-#define M_LFCRLF  (1 << 4)  /* map LF  --> CR + LF */
-#define M_IGNLF   (1 << 5)  /* map LF  --> <nothing> */
-#define M_DELBS   (1 << 6)  /* map DEL --> BS */
-#define M_BSDEL   (1 << 7)  /* map BS  --> DEL */
-#define M_SPCHEX  (1 << 8)  /* map special chars --> hex */
-#define M_TABHEX  (1 << 9)  /* map TAB --> hex */
-#define M_CRHEX   (1 << 10)  /* map CR --> hex */
-#define M_LFHEX   (1 << 11) /* map LF --> hex */
-#define M_8BITHEX (1 << 12) /* map 8-bit chars --> hex */
-#define M_NRMHEX  (1 << 13) /* map normal ASCII chars --> hex */
-#define M_NFLAGS 14
-
-/* default character mappings */
-#define M_I_DFL 0
-#define M_O_DFL 0
-#define M_E_DFL (M_DELBS | M_CRCRLF)
-
-/* character mapping names */
-struct map_names_s {
-    const char *name;
-    int flag;
-} map_names[] = {
-    { "crlf", M_CRLF },
-    { "crcrlf", M_CRCRLF },
-    { "igncr", M_IGNCR },
-    { "lfcr", M_LFCR },
-    { "lfcrlf", M_LFCRLF },
-    { "ignlf", M_IGNLF },
-    { "delbs", M_DELBS },
-    { "bsdel", M_BSDEL },
-    { "spchex", M_SPCHEX },
-    { "tabhex", M_TABHEX },
-    { "crhex", M_CRHEX },
-    { "lfhex", M_LFHEX },
-    { "8bithex", M_8BITHEX },
-    { "nrmhex", M_NRMHEX },
-    /* Sentinel */
-    { NULL, 0 }
-};
-
 int
 parse_map (char *s)
 {
@@ -176,9 +143,9 @@ parse_map (char *s)
 
     flags = 0;
     while ( (t = strtok(s, ", \t")) ) {
-        for (i=0; (m = map_names[i].name); i++) {
+        for (i=0; (m = valid_map_values[i].name); i++) {
             if ( ! strcmp(t, m) ) {
-                f = map_names[i].flag;
+                f = valid_map_values[i].value;
                 break;
             }
         }
@@ -197,7 +164,7 @@ print_map (int flags)
 
     for (i = 0; i < M_NFLAGS; i++)
         if ( flags & (1 << i) )
-            printf("%s,", map_names[i].name);
+            printf("%s,", valid_map_values[i].name);
     printf("\n");
 }
 
@@ -218,7 +185,6 @@ picocom_options_t opts = {
     .nolock = 0,
 #endif
     .escape = CKEY('a'),
-    .noescape = 0,
     .imap = M_I_DFL,
     .omap = M_O_DFL,
     .emap = M_E_DFL,
@@ -1475,7 +1441,7 @@ loop(void)
                     state = ST_TRANSPARENT;
                     break;
                 case ST_TRANSPARENT:
-                    if ( ! opts.noescape && c == opts.escape )
+                    if ( opts.escape && c == opts.escape )
                         state = ST_COMMAND;
                     else
                         if ( tty_q_push((char *)&c, 1) != 1 )
@@ -1676,7 +1642,7 @@ int parse_raise_lower(char *optarg) {
     return RTS_DTR_ERROR;
 }
 
-void
+int
 parse_args(int argc, char *argv[])
 {
     int r;
@@ -1719,9 +1685,35 @@ parse_args(int argc, char *argv[])
         {0, 0, 0, 0}
     };
 
-    // set some defaults that can't be set statically
-    opts.receive_cmd = strdup(DEFAULT_RECEIVE_CMD);
-    opts.send_cmd = strdup(DEFAULT_SEND_CMD);
+#ifdef CONFIGFILE
+    opts.baud = cfg_getint(cfg, "baud");
+    opts.databits = cfg_getint(cfg, "databits");
+    opts.raise_lower_dtr = cfg_getint(cfg, "dtr");
+    opts.lecho = cfg_getbool(cfg, "echo");
+    opts.escape = cfg_getint(cfg, "escape");
+    opts.flow = cfg_getint(cfg, "flow");
+    opts.hangup = cfg_getbool(cfg, "hangup");
+    opts.initstring = cfg_getstr(cfg, "initstring");
+    opts.log_filename = cfg_getstr(cfg, "logfile");
+    opts.noinit = cfg_getbool(cfg, "noinit");
+    opts.noreset = cfg_getbool(cfg, "noreset");
+    opts.parity = cfg_getint(cfg, "parity");
+    opts.excl = cfg_getbool(cfg, "excl");
+    opts.quiet = cfg_getbool(cfg, "quiet");
+    opts.receive_cmd = cfg_getstr(cfg, "receive-cmd");
+    opts.raise_lower_rts = cfg_getint(cfg, "rts");
+    opts.send_cmd = cfg_getstr(cfg, "send-cmd");
+    opts.stopbits = cfg_getint(cfg, "stopbits");
+    opts.txdelay.tv_nsec = cfg_getint(cfg, "tx-delay");
+
+    opts.imap = map_from_config(cfg, "imap");
+    opts.omap = map_from_config(cfg, "omap");
+    opts.emap = map_from_config(cfg, "emap");
+
+#if defined (UUCP_LOCK_DIR) || defined (USE_FLOCK)
+    opts.nolock = cfg_getbool(cfg, "nolock");
+#endif
+#endif
 
     r = 0;
     while (1) {
@@ -1784,7 +1776,7 @@ parse_args(int argc, char *argv[])
             opts.escape = CKEY(optarg[0]);
             break;
         case 'n':
-            opts.noescape = 1;
+            opts.escape = 0;
             break;
         case 'f':
             switch (optarg[0]) {
@@ -1910,6 +1902,15 @@ parse_args(int argc, char *argv[])
         case 5:
             opts.excl = 1;
             break;
+        case 'T':
+            opts.txdelay.tv_nsec = strtol(optarg, &ep, 10);
+
+            /* Limit to 1 second */
+            if (!ep || *ep != '\0') {
+                fprintf(stderr, "Invalid --tx-delay: %s is not a number\n", optarg);
+                r = -1;
+            }
+            break;
         case 'x':
             opts.exit_after = strtol(optarg, &ep, 10);
             if ( ! ep || *ep != '\0' || opts.exit_after < 0 ) {
@@ -1938,27 +1939,39 @@ parse_args(int argc, char *argv[])
         }
         if ( r < 0 ) {
             fprintf(stderr, "Run with '--help'.\n");
-            exit(EXIT_FAILURE);
+            return -1;
         }
     } /* while */
 
     /* --exit overrides --exit-after */
     if ( opts.exit ) opts.exit_after = -1;
 
-    if ( (argc - optind) < 1) {
-        fprintf(stderr, "No port given\n");
-        fprintf(stderr, "Run with '--help'.\n");
-        exit(EXIT_FAILURE);
-    }
-    opts.port = strdup(argv[argc-1]);
-    if ( ! opts.port ) {
-        fprintf(stderr, "Out of memory\n");
-        exit(EXIT_FAILURE);
+    /* Limit to 1 second */
+    if (opts.txdelay.tv_nsec < 0 || opts.txdelay.tv_nsec >= 1000000000) {
+        fprintf(stderr, "Invalid --tx-delay (must be between 0 and 999999999): %ld\n", opts.txdelay.tv_nsec);
+        return -1;
     }
 
-    if ( opts.quiet )
-        return;
+#ifdef CONFIGFILE
+    opts.port = cfg_getstr(cfg, "port");
+#endif
+    if (!opts.port) {
+        if ( (argc - optind) < 1) {
+            fprintf(stderr, "No port given\n");
+            fprintf(stderr, "Run with '--help'.\n");
+            return -1;
+        }
+        opts.port = strdup(argv[argc-1]);
+        if ( ! opts.port ) {
+            fprintf(stderr, "Out of memory\n");
+            return -1;
+        }
+    }
 
+    return 0;
+}
+
+void show_config() {
 #ifndef NO_HELP
     printf("picocom v%s\n", VERSION_STR);
     printf("\n");
@@ -1968,7 +1981,7 @@ parse_args(int argc, char *argv[])
     printf("parity is      : %s\n", parity_str[opts.parity]);
     printf("databits are   : %d\n", opts.databits);
     printf("stopbits are   : %d\n", opts.stopbits);
-    if ( opts.noescape ) {
+    if ( opts.escape == 0 ) {
         printf("escape is      : none\n");
     } else {
         printf("escape is      : C-%c\n", KEYC(opts.escape));
@@ -2047,7 +2060,16 @@ set_dtr_rts (void)
     }
 }
 
+void
+init_defaults()
+{
+    // set some defaults that can't be set statically
+    // (this must be done before calling init_config)
+    opts.receive_cmd = strdup(DEFAULT_RECEIVE_CMD);
+    opts.send_cmd = strdup(DEFAULT_SEND_CMD);
+}
 
+#ifndef TESTING
 int
 main (int argc, char *argv[])
 {
@@ -2055,7 +2077,20 @@ main (int argc, char *argv[])
     int ler;
     int r;
 
-    parse_args(argc, argv);
+    init_defaults();
+#ifdef CONFIGFILE
+    init_config();
+    if (parse_config_file(NULL) != 0) {
+        exit(EXIT_FAILURE);
+    }
+#endif
+    if (parse_args(argc, argv) != 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    if (!opts.quiet) {
+        show_config();
+    }
 
     establish_signal_handlers();
 
@@ -2124,7 +2159,7 @@ main (int argc, char *argv[])
     /* Check for settings mismatch and print warning */
     if ( !opts.quiet && !opts.noinit && show_status(1) != 0 ) {
         pinfo("!! Settings mismatch !!");
-        if ( ! opts.noescape )
+        if ( opts.escape )
             pinfo(" Type [C-%c] [C-%c] to see actual port settings",
                   KEYC(opts.escape), KEYC(KEY_STATUS));
         pinfo("\r\n");
@@ -2178,7 +2213,7 @@ main (int argc, char *argv[])
     }
 
 #ifndef NO_HELP
-    if ( ! opts.noescape ) {
+    if ( opts.escape ) {
         pinfo("Type [C-%c] [C-%c] to see available commands\r\n",
               KEYC(opts.escape), KEYC(KEY_HELP));
     }
@@ -2205,6 +2240,7 @@ main (int argc, char *argv[])
 
     return xcode;
 }
+#endif
 
 /**********************************************************************/
 
