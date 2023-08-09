@@ -1,8 +1,12 @@
 *.o
 *.d
-*~
+~
 /picocom
+/test_picocom
 picocom.1
 picocom.1.html
 picocom.1.pdf
 node_modules/
+GNUmakefile
+test_picocom.log
+test_picocom.tap

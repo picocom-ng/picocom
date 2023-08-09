@@ -23,12 +23,12 @@ VERSION = $(shell git describe --long)
 -include version.mk
 
 #CC ?= gcc
-CPPFLAGS += -DVERSION_STR=\"$(VERSION)\"
-CFLAGS += -Wall -g
+CPPFLAGS += -DVERSION_STR=\"$(VERSION)\" $(EXTRA_CPPFLAGS)
+CFLAGS += -Wall -g $(EXTRA_CFLAGS)
 
 LD = $(CC)
-LDFLAGS ?= -g
-LDLIBS ?=
+LDFLAGS ?= -g $(EXTRA_LDFLAGS)
+LDLIBS +=
 
 SRCS = picocom.c term.c fdio.c split.c custbaud.c termios2.c custbaud_bsd.c
 
@@ -76,6 +76,11 @@ endif
 OBJS = $(SRCS:.c=.o)
 DEPS = $(SRCS:.c=.d)
 NODEPS = clean distclean realclean doc
+SUFFIXES += .d
+
+TEST_SRCS = test_picocom.c test_configfile.c
+TEST_OBJS = $(TEST_SRCS:.c=.o)
+TEST_DEPS = $(TEST_SRCS:.c=.d)
 
 %.o: %.c %.d
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
@@ -109,7 +114,8 @@ picocom.1.pdf : picocom.1.html
 	htmldoc -f $@ $<
 
 clean:
-	rm -f $(OBJS) $(DEPS)
+	rm -f $(OBJS) $(DEPS) $(TEST_OBJS) $(TEST_DEPS)
+	rm -f test_picocom.log test_picocom.tap
 	rm -f *~
 	rm -f \#*\#
 
@@ -126,5 +132,19 @@ smoketest: picocom
 	bats tests/smoke
 
 ifeq (,$(findstring $(MAKECMDGOALS),$(NODEPS)))
--include $(DEPS)
+-include $(DEPS) $(TEST_DEPS)
 endif
+
+# Detect if $(CC) is gcc so that we can conditionally
+# use gcc-specific flags. This allows us to compile with
+# clang (e.g. on FreeBSD).
+ISGCC = $(shell $(CC) -v 2>&1 | grep -c gcc.version)
+
+test_picocom: CPPFLAGS += -DTESTING
+test_picocom: LDLIBS += -lcheck -lsubunit -lm
+test_picocom: $(TEST_OBJS) $(OBJS)
+	$(LD) $(LDFLAGS) -o $@ $(TEST_OBJS) $(OBJS) $(LDLIBS)
+
+.PHONY: test
+test: realclean test_picocom
+	./test_picocom --verbose
