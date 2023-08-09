@@ -1,3 +1,19 @@
+##
+## FEATURE SELECTION
+##
+
+# Set this to 0 to disable high baudrate support
+FEATURE_HIGH_BAUD ?= 1
+
+# Set this to 0 to disable locking via flock (and use uucp-style
+# locks instead)
+FEATURE_USE_FLOCK ?= 1
+
+# Set this to 0 to disable linenoise support
+FEATURE_LINENOISE ?= 1
+
+# Set this to 0 to disable help strings (saves ~ 4-6 Kb)
+FEATURE_HELP ?= 1
 
 VERSION = $(shell git describe --long)
 -include version.mk
@@ -10,33 +26,31 @@ LD = $(CC)
 LDFLAGS ?= -g
 LDLIBS ?=
 
-all: picocom
-OBJS =
+OBJS = picocom.o term.o fdio.o split.o custbaud.o termios2.o custbaud_bsd.o
 
 ## This is the maximum size (in bytes) the output (e.g. copy-paste)
 ## queue is allowed to grow to. Zero means unlimitted.
 TTY_Q_SZ = 0
 CPPFLAGS += -DTTY_Q_SZ=$(TTY_Q_SZ)
 
-## Comment this out to disable high-baudrate support
+ifeq ($(FEATURE_HIGH_BAUD),1)
 CPPFLAGS += -DHIGH_BAUD
+endif
 
-## Normally you should NOT enable both: UUCP-style and flock(2)
-## locking.
-
-## Comment this out to disable locking with flock
+ifeq ($(FEATURE_USE_FLOCK),1)
 CPPFLAGS += -DUSE_FLOCK
+else
+UUCP_LOCK_DIR=/var/lock
+CPPFLAGS += -DUUCP_LOCK_DIR=\"$(UUCP_LOCK_DIR)\"
+endif
 
-## Comment these out to disable UUCP-style lockdirs
-#UUCP_LOCK_DIR=/var/lock
-#CPPFLAGS += -DUUCP_LOCK_DIR=\"$(UUCP_LOCK_DIR)\"
-
-## Comment these out to disable "linenoise"-library support
+ifeq ($(FEATURE_LINENOISE),1)
 HISTFILE = .picocom_history
 CPPFLAGS += -DHISTFILE=\"$(HISTFILE)\" \
 	    -DLINENOISE
 OBJS += linenoise-1.0/linenoise.o
 linenoise-1.0/linenoise.o : linenoise-1.0/linenoise.c linenoise-1.0/linenoise.h
+endif
 
 ## Comment this in to enable (force) custom baudrate support
 ## even on systems not enabled by default.
@@ -46,11 +60,12 @@ linenoise-1.0/linenoise.o : linenoise-1.0/linenoise.c linenoise-1.0/linenoise.h
 ## on ALL systems (even on these enabled by default).
 #CPPFLAGS += -DNO_CUSTOM_BAUD
 
-## Comment this IN to remove help strings (saves ~ 4-6 Kb).
-#CPPFLAGS += -DNO_HELP
+ifeq ($(FEATURE_HELP),0)
+CPPFLAGS += -DNO_HELP
+endif
 
+all: picocom
 
-OBJS += picocom.o term.o fdio.o split.o custbaud.o termios2.o custbaud_bsd.o
 picocom : $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
 
@@ -64,7 +79,6 @@ custbaud.o : custbaud.c custbaud.h
 
 .c.o :
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
-
 
 doc : picocom.1.html picocom.1 picocom.1.pdf
 
@@ -86,11 +100,8 @@ picocom.1.html : picocom.1.md
 picocom.1.pdf : picocom.1.html
 	htmldoc -f $@ $<
 
-
 clean:
-	rm -f picocom.o term.o fdio.o split.o
-	rm -f linenoise-1.0/linenoise.o
-	rm -f custbaud.o termios2.o custbaud_bsd.o
+	rm -f $(OBJS)
 	rm -f *~
 	rm -f \#*\#
 
