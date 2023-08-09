@@ -379,44 +379,24 @@ Picocom accepts the following command-line options.
     Note, that the init string is not sent if `--noinit` is
     given. (Default: empty).
 
-`--lower-rts`
+`--rts` `none` | `raise` | `lower`
 
-:   Lower the RTS modem control signal after opening the serial port.
-    Only supported when flow-control mode is not set to RTS/CTS,
+:   `raise` or `lower` the RTS modem control signal after opening the
+    serial port. Only supported when flow-control mode is not set to RTS/CTS,
     ignored otherwise. Only supported on some systems.
 
-    If neither `--lower-rts` nor `--raise-rts` are given, the
-    state of the RTS signal, after opening and configuring the port, is
-    system dependent. On most systems the signal is raised.
+    When `--rts` is `none` (the default), the state of the RTS signal,
+    after opening and configuring the port, is system dependent. On most
+    systems the signal is raised.
 
-`--raise-rts`
+`--dtr` `none` | `raise` | `lower`
 
-:   Raise the RTS modem control signal after opening the serial port.
-    Only supported when flow-control mode is not set to RTS/CTS,
-    ignored otherwise. Only supported on some systems.
+:   `raise` or `lower` the DTR modem control signal after opening the
+    serial port. Only supported on some systems.
 
-    If neither `--raise-rts` nor `--lower-rts` are given, the
-    state of the RTS signal, after opening and configuring the port, is
-    system dependent. On most systems the signal is raised.
-
-`--lower-dtr`
-
-:   Lower the DTR control signal after opening the serial port. Only
-    supported on some systems.
-
-    If neither `--lower-dtr` nor `--raise-dtr` are given, the
-    state of the DTR signal, after opening and configuring the port,
-    is system dependent. On most systems the signal is raised.
-
-`--raise-dtr`
-
-:   Raise the DTR control signal after opening the serial port. Only
-    supported on some systems.
-
-    If neither `--raise-dtr` nor `--lower-dtr` are given, the
-    state of the DTR signal, after opening and configuring the port,
-    is system dependent. On most systems the signal is raised.
-
+    When `--dtr` is `none` (the default), the state of the DTR signal,
+    after opening and configuring the port, is system dependent. On most
+    systems the signal is raised.
 
 `--excl`
 

@@ -33,7 +33,6 @@
 #include <sys/wait.h>
 #include <sys/ioctl.h>
 #include <limits.h>
-#include <time.h>
 #ifdef USE_FLOCK
 #include <sys/file.h>
 #endif
@@ -73,6 +72,20 @@ const char *flow_str[] = {
     [FC_XONXOFF] = "xon/xoff",
     [FC_OTHER] = "other",
     [FC_ERROR] = "invalid flow control mode",
+};
+
+/**********************************************************************/
+
+#define RTS_DTR_NONE 0
+#define RTS_DTR_RAISE 1
+#define RTS_DTR_LOWER 2
+#define RTS_DTR_ERROR 3
+
+const char *rts_dtr_str[] = {
+    [RTS_DTR_NONE] = "none",
+    [RTS_DTR_RAISE] = "raise",
+    [RTS_DTR_LOWER] = "lower",
+    [RTS_DTR_ERROR] = "invalid raise/lower setting",
 };
 
 /**********************************************************************/
@@ -215,9 +228,10 @@ struct {
     int lower_dtr;
     int raise_rts;
     int raise_dtr;
+    int raise_lower_rts;
+    int raise_lower_dtr;
     int excl;
     int quiet;
-    struct timespec txdelay;
 } opts = {
     .port = NULL,
     .baud = 9600,
@@ -247,9 +261,10 @@ struct {
     .lower_dtr = 0,
     .raise_rts = 0,
     .raise_dtr = 0,
+    .raise_lower_rts = RTS_DTR_NONE,
+    .raise_lower_dtr = RTS_DTR_NONE,
     .excl = 0,
-    .quiet = 0,
-    .txdelay = { 0, 0 },
+    .quiet = 0
 };
 
 int sig_exit = 0;
@@ -622,11 +637,12 @@ read_baud (void)
         if ( ! ep || *ep != '\0' || ! term_baud_ok(baud) || baud == 0 ) {
             fd_printf(STO, "*** Invalid baudrate!");
             baud = -1;
-        } else {
-            add_history(baudstr);
         }
         free(baudstr);
     } while (baud < 0);
+
+    if (baudstr != NULL)
+        add_history(baudstr);
 
     return baud;
 }
@@ -635,19 +651,19 @@ int
 read_hex (unsigned char *buff, int sz)
 {
     char *hexstr;
-    int n = 0;
+    int n;
 
     do {
         fd_printf(STO, "\r\n");
         hexstr = linenoise("*** hex: ");
         fd_printf(STO, "\r");
-        if ( hexstr == NULL )
+        if ( hexstr == NULL ) {
+            n = 0;
             break;
+        }
         n = hex2bin(buff, sz, hexstr);
         if ( n < 0 )
             fd_printf(STO, "*** Invalid hex!");
-        else if (n > 0)
-            add_history(hexstr);
         free(hexstr);
     } while (n < 0);
 
@@ -1545,12 +1561,7 @@ loop(void)
             int sz;
             sz = (tty_q.len < tty_write_sz) ? tty_q.len : tty_write_sz;
             do {
-                if (opts.txdelay.tv_nsec) {
-                    n = write(tty_fd, tty_q.buff, 1);
-                    nanosleep(&opts.txdelay, NULL);
-                } else {
-                    n = write(tty_fd, tty_q.buff, sz);
-                }
+                n = write(tty_fd, tty_q.buff, sz);
             } while ( n < 0 && errno == EINTR );
             if ( n <= 0 )
                 fatal("write to port failed: %s", strerror(errno));
@@ -1644,7 +1655,6 @@ show_usage(char *name)
     printf("  --parit<y> o (=odd) | e (=even) | n (=none)\n");
     printf("  --<d>atabits 5 | 6 | 7 | 8\n");
     printf("  --sto<p>bits 1 | 2\n");
-    printf("  --<T>xdelay <nsec>\n");
     printf("  --<e>scape <char>\n");
     printf("  --<n>o-escape\n");
     printf("  --e<c>ho\n");
@@ -1661,10 +1671,8 @@ show_usage(char *name)
     printf("  --inits<t>ring <string>\n");
     printf("  --e<x>it-after <msec>\n");
     printf("  --e<X>it\n");
-    printf("  --lower-rts\n");
-    printf("  --raise-rts\n");
-    printf("  --lower-dtr\n");
-    printf("  --raise-dtr\n");
+    printf("  --rts none | raise | lower\n");
+    printf("  --dtr none | raise | lower\n");
     printf("  --excl\n");
     printf("  --<q>uiet\n");
     printf("  --<h>elp\n");
@@ -1692,6 +1700,16 @@ show_usage(char *name)
 }
 
 /**********************************************************************/
+
+int parse_raise_lower(char *optarg) {
+    for (int i=0; i < RTS_DTR_ERROR; i++) {
+        if (strcmp(optarg, rts_dtr_str[i]) == 0) {
+            return i;
+        }
+    }
+
+    return RTS_DTR_ERROR;
+}
 
 void
 parse_args(int argc, char *argv[])
@@ -1721,14 +1739,18 @@ parse_args(int argc, char *argv[])
         {"initstring", required_argument, 0, 't'},
         {"exit-after", required_argument, 0, 'x'},
         {"exit", no_argument, 0, 'X'},
+        {"rts", required_argument, 0, 'R'},
+        {"dtr", required_argument, 0, 'D'},
+        {"tx-delay", required_argument, 0, 'T'},
+        {"quiet", no_argument, 0, 'q'},
+        {"help", no_argument, 0, 'h'},
+        {"excl", no_argument, 0, 5},
+
+        // deprecated options
         {"lower-rts", no_argument, 0, 1},
         {"lower-dtr", no_argument, 0, 2},
         {"raise-rts", no_argument, 0, 3},
         {"raise-dtr", no_argument, 0, 4},
-        {"excl", no_argument, 0, 5},
-        {"tx-delay", required_argument, 0, 'T'},
-        {"quiet", no_argument, 0, 'q'},
-        {"help", no_argument, 0, 'h'},
         {0, 0, 0, 0}
     };
 
@@ -1742,7 +1764,7 @@ parse_args(int argc, char *argv[])
         /* no default error messages printed. */
         opterr = 0;
 
-        c = getopt_long(argc, argv, "hirulcqXnv:s:r:e:f:b:y:d:p:g:t:x:T:",
+        c = getopt_long(argc, argv, "hirulcqXnv:s:r:e:f:b:y:d:p:g:t:x:",
                         longOptions, &optionIndex);
 
         if (c < 0)
@@ -1895,27 +1917,29 @@ parse_args(int argc, char *argv[])
             opts.initstring = strdup(optarg);
             break;
         case 1:
-            opts.lower_rts = 1;
+            opts.raise_lower_rts = RTS_DTR_LOWER;
             break;
         case 2:
-            opts.lower_dtr = 1;
+            opts.raise_lower_dtr = RTS_DTR_LOWER;
             break;
         case 3:
-            opts.raise_rts = 1;
+            opts.raise_lower_rts = RTS_DTR_RAISE;
             break;
         case 4:
-            opts.raise_dtr = 1;
+            opts.raise_lower_dtr = RTS_DTR_RAISE;
+            break;
+        case 'R':
+            if (RTS_DTR_ERROR == (opts.raise_lower_rts = parse_raise_lower(optarg))) {
+                fprintf(stderr, "Invalid --rts (must be none, raise, or lower)\n");
+            }
+            break;
+        case 'D':
+            if (RTS_DTR_ERROR == (opts.raise_lower_dtr = parse_raise_lower(optarg))) {
+                fprintf(stderr, "Invalid --rts (must be none, raise, or lower)\n");
+            }
             break;
         case 5:
             opts.excl = 1;
-        case 'T':
-            opts.txdelay.tv_nsec = strtol(optarg, &ep, 10);
-
-            /* Limit to 1 second */
-            if (!ep || *ep != '\0' || opts.txdelay.tv_nsec < 0 || opts.txdelay.tv_nsec >= 1000000000) {
-                fprintf(stderr, "Invalid --tx-delay (must be between 0 and 999999999): %s\n", optarg);
-                r = -1;
-            }
             break;
         case 'x':
             opts.exit_after = strtol(optarg, &ep, 10);
@@ -1949,15 +1973,6 @@ parse_args(int argc, char *argv[])
         }
     } /* while */
 
-    if ( opts.raise_rts && opts.lower_rts ) {
-        fprintf(stderr, "Both --raise-rts and --lower-rts given\n");
-        exit(EXIT_FAILURE);
-    }
-    if ( opts.raise_dtr && opts.lower_dtr ) {
-        fprintf(stderr, "Both --raise-dtr and --lower-dtr given\n");
-        exit(EXIT_FAILURE);
-    }
-
     /* --exit overrides --exit-after */
     if ( opts.exit ) opts.exit_after = -1;
 
@@ -1976,15 +1991,14 @@ parse_args(int argc, char *argv[])
         return;
 
 #ifndef NO_HELP
-    printf("picocom v%s\r\n", VERSION_STR);
-    printf("\r\n");
-    printf("port is        : %s\r\n", opts.port);
-    printf("flowcontrol    : %s\r\n", flow_str[opts.flow]);
-    printf("baudrate is    : %d\r\n", opts.baud);
-    printf("parity is      : %s\r\n", parity_str[opts.parity]);
-    printf("databits are   : %d\r\n", opts.databits);
-    printf("stopbits are   : %d\r\n", opts.stopbits);
-    printf("txdelay is     : %ld ns\r\n", opts.txdelay.tv_nsec);
+    printf("picocom v%s\n", VERSION_STR);
+    printf("\n");
+    printf("port is        : %s\n", opts.port);
+    printf("flowcontrol    : %s\n", flow_str[opts.flow]);
+    printf("baudrate is    : %d\n", opts.baud);
+    printf("parity is      : %s\n", parity_str[opts.parity]);
+    printf("databits are   : %d\n", opts.databits);
+    printf("stopbits are   : %d\n", opts.stopbits);
     if ( opts.noescape ) {
         printf("escape is      : none\n");
     } else {
@@ -2028,13 +2042,13 @@ void
 set_dtr_rts (void)
 {
     int r;
-    if ( opts.lower_rts ) {
+    if ( opts.raise_lower_rts == RTS_DTR_LOWER ) {
         r = term_lower_rts(tty_fd);
         if ( r < 0 )
             fatal("failed to lower RTS of port: %s",
                   term_strerror(term_errno, errno));
         rts_up = 0;
-    } else if ( opts.raise_rts ) {
+    } else if ( opts.raise_lower_rts == RTS_DTR_RAISE ) {
         r = term_raise_rts(tty_fd);
         if ( r < 0 )
             fatal("failed to raise RTS of port: %s",
@@ -2042,13 +2056,13 @@ set_dtr_rts (void)
         rts_up = 1;
     }
 
-    if ( opts.lower_dtr ) {
+    if ( opts.raise_lower_dtr == RTS_DTR_LOWER ) {
         r = term_lower_dtr(tty_fd);
         if ( r < 0 )
             fatal("failed to lower DTR of port: %s",
                   term_strerror(term_errno, errno));
         dtr_up = 0;
-    } else if ( opts.raise_dtr ) {
+    } else if ( opts.raise_lower_dtr == RTS_DTR_RAISE ) {
         r = term_raise_dtr(tty_fd);
         if ( r < 0 )
             fatal("failed to raise DTR of port: %s",
@@ -2219,9 +2233,6 @@ main (int argc, char *argv[])
         xcode = EXIT_FAILURE;
     } else
         pinfo("Thanks for using picocom\r\n");
-
-    if ( opts.quiet )
-        fd_printf(STO, "\r\n");
 
     return xcode;
 }
