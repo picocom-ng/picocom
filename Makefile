@@ -26,7 +26,7 @@ LD = $(CC)
 LDFLAGS ?= -g
 LDLIBS ?=
 
-OBJS = picocom.o term.o fdio.o split.o custbaud.o termios2.o custbaud_bsd.o
+SRCS = picocom.c term.c fdio.c split.c custbaud.c termios2.c custbaud_bsd.c
 
 ## This is the maximum size (in bytes) the output (e.g. copy-paste)
 ## queue is allowed to grow to. Zero means unlimitted.
@@ -48,8 +48,7 @@ ifeq ($(FEATURE_LINENOISE),1)
 HISTFILE = .picocom_history
 CPPFLAGS += -DHISTFILE=\"$(HISTFILE)\" \
 	    -DLINENOISE
-OBJS += linenoise-1.0/linenoise.o
-linenoise-1.0/linenoise.o : linenoise-1.0/linenoise.c linenoise-1.0/linenoise.h
+SRCS += linenoise-1.0/linenoise.c
 endif
 
 ## Comment this in to enable (force) custom baudrate support
@@ -64,21 +63,20 @@ ifeq ($(FEATURE_HELP),0)
 CPPFLAGS += -DNO_HELP
 endif
 
+OBJS = $(SRCS:.c=.o)
+DEPS = $(SRCS:.c=.d)
+NODEPS = clean distclean realclean doc
+
+%.o: %.c %.d
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
+
+%.d: %.c
+	$(CC) $(CPPFLAGS) -MM $< -MF $@
+
 all: picocom
 
 picocom : $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
-
-picocom.o : picocom.c term.h fdio.h split.h custbaud.h
-term.o : term.c term.h termios2.h custbaud_bsd.h custbaud.h
-split.o : split.c split.h
-fdio.o : fdio.c fdio.h
-termios2.o : termios2.c termios2.h termbits2.h custbaud.h
-custbaud_bsd.o : custbaud_bsd.c custbaud_bsd.h custbaud.h
-custbaud.o : custbaud.c custbaud.h
-
-.c.o :
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
 
 doc : picocom.1.html picocom.1 picocom.1.pdf
 
@@ -101,7 +99,7 @@ picocom.1.pdf : picocom.1.html
 	htmldoc -f $@ $<
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(DEPS)
 	rm -f *~
 	rm -f \#*\#
 
@@ -117,3 +115,6 @@ realclean: distclean
 smoketest: picocom
 	bats tests/smoke
 
+ifeq (,$(findstring $(MAKECMDGOALS),$(NODEPS)))
+-include $(DEPS)
+endif

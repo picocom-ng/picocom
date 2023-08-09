@@ -1,4 +1,5 @@
 *.o
+*.d
 *~
 /picocom
 picocom.1
