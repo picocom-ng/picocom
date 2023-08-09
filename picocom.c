@@ -90,6 +90,9 @@ const char *rts_dtr_str[] = {
 
 /**********************************************************************/
 
+#define DEFAULT_SEND_CMD "sz -vv"
+#define DEFAULT_RECEIVE_CMD "rz -vv -E"
+
 /* control-key to printable character (lowcase) */
 #define KEYC(k) ((k) | 0x60)
 /* printable character to control-key */
@@ -215,8 +218,8 @@ struct {
 #endif
     unsigned char escape;
     int noescape;
-    char send_cmd[128];
-    char receive_cmd[128];
+    char *send_cmd;
+    char *receive_cmd;
     int imap;
     int omap;
     int emap;
@@ -248,8 +251,6 @@ struct {
 #endif
     .escape = CKEY('a'),
     .noescape = 0,
-    .send_cmd = "sz -vv",
-    .receive_cmd = "rz -vv -E",
     .imap = M_I_DFL,
     .omap = M_O_DFL,
     .emap = M_E_DFL,
@@ -1754,6 +1755,10 @@ parse_args(int argc, char *argv[])
         {0, 0, 0, 0}
     };
 
+    // set some defaults that can't be set statically
+    opts.receive_cmd = strdup(DEFAULT_RECEIVE_CMD);
+    opts.send_cmd = strdup(DEFAULT_SEND_CMD);
+
     r = 0;
     while (1) {
         int optionIndex = 0;
@@ -1772,12 +1777,12 @@ parse_args(int argc, char *argv[])
 
         switch (c) {
         case 's':
-            strncpy(opts.send_cmd, optarg, sizeof(opts.send_cmd));
-            opts.send_cmd[sizeof(opts.send_cmd) - 1] = '\0';
+            if ( opts.send_cmd ) free(opts.send_cmd);
+            opts.send_cmd = strdup(optarg);
             break;
         case 'v':
-            strncpy(opts.receive_cmd, optarg, sizeof(opts.receive_cmd));
-            opts.receive_cmd[sizeof(opts.receive_cmd) - 1] = '\0';
+            if ( opts.receive_cmd ) free(opts.receive_cmd);
+            opts.receive_cmd = strdup(optarg);
             break;
         case 'I':
             map = parse_map(optarg);
