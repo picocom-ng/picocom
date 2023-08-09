@@ -47,6 +47,7 @@
 #include "fdio.h"
 #include "split.h"
 #include "term.h"
+#include "picocom.h"
 #ifdef LINENOISE
 #include "linenoise-1.0/linenoise.h"
 #endif
@@ -202,40 +203,7 @@ print_map (int flags)
 
 /**********************************************************************/
 
-struct {
-    char *port;
-    int baud;
-    enum flowcntrl_e flow;
-    enum parity_e parity;
-    int databits;
-    int stopbits;
-    int lecho;
-    int noinit;
-    int noreset;
-    int hangup;
-#if defined (UUCP_LOCK_DIR) || defined (USE_FLOCK)
-    int nolock;
-#endif
-    unsigned char escape;
-    int noescape;
-    char *send_cmd;
-    char *receive_cmd;
-    int imap;
-    int omap;
-    int emap;
-    char *log_filename;
-    char *initstring;
-    int exit_after;
-    int exit;
-    int lower_rts;
-    int lower_dtr;
-    int raise_rts;
-    int raise_dtr;
-    int raise_lower_rts;
-    int raise_lower_dtr;
-    int excl;
-    int quiet;
-} opts = {
+picocom_options_t opts = {
     .port = NULL,
     .baud = 9600,
     .flow = FC_NONE,
@@ -258,10 +226,6 @@ struct {
     .initstring = NULL,
     .exit_after = -1,
     .exit = 0,
-    .lower_rts = 0,
-    .lower_dtr = 0,
-    .raise_rts = 0,
-    .raise_dtr = 0,
     .raise_lower_rts = RTS_DTR_NONE,
     .raise_lower_dtr = RTS_DTR_NONE,
     .excl = 0,
