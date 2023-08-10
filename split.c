@@ -186,41 +186,6 @@ split_quoted (const char *s, int *argc, char *argv[], int argv_sz)
     return ( err != ERR_OK ) ? -1 : flags;
 }
 
-/**********************************************************************/
-
-#if 0
-
-int
-main (int argc, char *argv[])
-{
-    char *my_argv[12];
-    int my_argc, i, r;
-
-    if ( argc != 2 ) {
-        printf("Usage is: %s: <string to split>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
-
-    printf("String to split is: [%s]\n", argv[1]);
-    r = split_quoted(argv[1], &my_argc, my_argv, 12);
-    if ( r < 0 ) {
-        printf("Spliting failed!\n");
-        exit(EXIT_FAILURE);
-    }
-    printf("Split ok. SPLIT_DROP is %s, SPLIT_TRUNC is %s\n",
-           (r & SPLIT_DROP) ? "ON" : "off",
-           (r & SPLIT_TRUNC) ? "ON" : "off");
-
-    for (i = 0; i < my_argc; i++)
-        printf("%02d : [%s]\n", i, my_argv[i]);
-
-    return EXIT_SUCCESS;
-}
-
-#endif
-
-/**********************************************************************/
-
 /*
  * Local Variables:
  * mode:c

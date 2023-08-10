@@ -1009,9 +1009,6 @@ show_keys()
 
 /**********************************************************************/
 
-#define RUNCMD_ARGS_MAX 32
-#define RUNCMD_EXEC_FAIL 126
-
 void
 establish_child_signal_handlers (void)
 {

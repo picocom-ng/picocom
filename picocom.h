@@ -39,6 +39,9 @@
 /* printable character to control-key */
 #define CKEY(c) ((c) & 0x1f)
 
+#define RUNCMD_ARGS_MAX 32
+#define RUNCMD_EXEC_FAIL 126
+
 typedef struct {
     char *port;
     int baud;

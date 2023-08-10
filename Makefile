@@ -78,7 +78,7 @@ DEPS = $(SRCS:.c=.d)
 NODEPS = clean distclean realclean doc
 SUFFIXES += .d
 
-TEST_SRCS = test_picocom.c test_configfile.c
+TEST_SRCS = test_picocom.c test_configfile.c test_split.c
 TEST_OBJS = $(TEST_SRCS:.c=.o)
 TEST_DEPS = $(TEST_SRCS:.c=.d)
 
