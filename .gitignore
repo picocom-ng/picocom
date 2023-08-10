@@ -1,5 +1,7 @@
 *.o
 *.d
+*.gcno
+*.gcda
 ~
 /picocom
 /test_picocom
@@ -8,5 +10,6 @@ picocom.1.html
 picocom.1.pdf
 node_modules/
 GNUmakefile
+<<<<<<< current
 test_picocom.log
 test_picocom.tap
