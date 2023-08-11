@@ -1713,6 +1713,8 @@ parse_args(int argc, char *argv[])
 #endif
 
     r = 0;
+    optind = 1;
+
     while (1) {
         int optionIndex = 0;
         int c;
