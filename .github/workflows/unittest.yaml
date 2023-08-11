@@ -1,0 +1,20 @@
+name: Unit tests
+on:
+  pull_request:
+  push:
+    branches-ignore: main
+
+jobs:
+  run-tests:
+    name: Run picocom unit tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro: [fedora, ubuntu]
+    container:
+      image: ghcr.io/picocom-ng/picocom-builder-${{ matrix.distro }}:main
+    steps:
+      - uses: actions/checkout@v3
+      - name: run tests
+        run: |
+          make test
