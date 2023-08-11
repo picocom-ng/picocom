@@ -23,6 +23,9 @@ FEATURE_HELP ?= 1
 # tests.
 FEATURE_COVERAGE ?= 0
 
+# Set this to 1 to enable address sanitization checks.
+FEATURE_SANITIZE ?= 0
+
 VERSION = $(shell git describe --long)
 -include version.mk
 
@@ -75,6 +78,11 @@ endif
 
 ifeq ($(FEATURE_HELP),0)
 CPPFLAGS += -DNO_HELP
+endif
+
+ifeq ($(FEATURE_SANITIZE),1)
+CFLAGS += -fsanitize=address,undefined
+LDFLAGS += -fsanitize=address,undefined
 endif
 
 OBJS = $(SRCS:.c=.o)
