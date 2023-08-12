@@ -1,5 +1,6 @@
 
-VERSION = 3.2a
+VERSION = $(shell git describe --long)
+-include version.mk
 
 #CC ?= gcc
 CPPFLAGS += -DVERSION_STR=\"$(VERSION)\"
@@ -72,16 +73,18 @@ picocom.1 : picocom.1.md
 	    -Vfooter="Picocom $(VERSION)" \
 	    -Vadjusting='l' \
 	    -Vhyphenate='' \
-	    -o $@ $?
+	    -o $@ $<
 
 picocom.1.html : picocom.1.md
+	# modern pandoc wants --embed-resources --standalone, but
+	# pandoc in github ci is too old.
 	pandoc -s -t html \
-	    --embed-resources --standalone \
+	    --standalone \
 	    -Vversion="v$(VERSION)" \
-	    -o $@ $?
+	    -o $@ $<
 
-picocom.1.pdf : picocom.1
-	groff -man -Tpdf $? > $@
+picocom.1.pdf : picocom.1.html
+	htmldoc -f $@ $<
 
 
 clean:
