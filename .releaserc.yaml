@@ -1,0 +1,13 @@
+repositoryUrl: https://github.com/picocom-ng/picocom
+branches:
+  - main
+plugins:
+  - - '@semantic-release/commit-analyzer'
+    - preset: conventionalcommits
+  - - '@semantic-release/release-notes-generator'
+    - preset: conventionalcommits
+  - - '@semantic-release/exec'
+    - prepareCmd: bash ci/make-release-tarball.sh ${nextRelease.version}
+  - - '@semantic-release/github'
+    - assets:
+        - path: release/*

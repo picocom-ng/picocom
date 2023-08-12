@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@semantic-release/commit-analyzer": "github:semantic-release/commit-analyzer",
+    "@semantic-release/exec": "github:semantic-release/exec",
+    "conventional-changelog-conventionalcommits": "^6.1.0",
+    "marked-mangle": "^1.1.2",
+    "semantic-release": "^21.0.7"
+  }
+}
