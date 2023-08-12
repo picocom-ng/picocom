@@ -674,18 +674,20 @@ operation and what happens in each such condition:
 
 # AUTHOR
 
-Written by Nick Patavalis <npat@efault.net>
+Picocom was originally written by Nick Patavalis. This fork is
+maintained by Lars Kellogg-Stedman, <lars@oddbit.com>.
 
 
 # AVAILABILITY
 
 Download the latest release from:
-<https://github.com/npat-efault/picocom/releases>
+<https://github.com/picocom-ng/picocom>.
 
 
 # COPYRIGHT
 
-Copyright (c) 2003-2018 Nick Patavalis
+- Copyright (c) 2003-2018 Nick Patavalis.
+- Copyright (c) 2023 Picocom contributors
 
 This file is part of Picocom.
 

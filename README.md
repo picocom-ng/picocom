@@ -1,11 +1,24 @@
-# picocom
-Minimal dumb-terminal emulator
+![[Picocom][]](assets/picocom-logo.png)
 
-by Nick Patavalis (npat@efault.net)
+[Picocom][] is a minimal dumb-terminal emulation program.
 
-The latest release can be downloaded from:
+[picocom]: https://picocom-ng.oddbit.com
 
-> https://github.com/npat-efault/picocom/releases
+## Origins
+
+This is a fork of Nick Patavalis's [original picocom repository][nick],
+which was last updated in 2018. I have incorporated most of the pull
+requests from Nick's repository as well as several of the changes
+introduced by [Wolfram Sang][].
+
+I am working on adding configuration file support, automated testing,
+and an automated release process. I am happy to accept bug reports and
+contributions (see [Contributing](#contributing), below).
+
+[nick]: https://github.com/npat-efault/picocom
+[wolfram sang]: https://gitlab.com/wsakernel/picocom
+
+## Overview
 
 As its name suggests, *picocom* is a minimal dumb-terminal emulation
 program. It is, in principle, very much like minicom, only it's "pico"
@@ -226,7 +239,7 @@ the following options:
 
        sudo cp ./bash_completion/picocom /etc/bash_completion.d/
 
-   This will enable custom completion support for picocom, globaly
+   This will enable custom completion support for picocom, globally
    (for all Bash-shell users).
 
    *NOTICE:* If you have another version of picocom already installed,
@@ -240,7 +253,7 @@ the following options:
    automatically sourcing custom completion scripts.
 
 2. If you want to automatically enable support *only for the current
-   user*, you must arange for your user's `.bashrc` to source the
+   user*, you must arrange for your user's `.bashrc` to source the
    custom completion script. There are, obviously, many ways to do
    this, so the following *is only a suggestion*:
 
@@ -302,7 +315,7 @@ convenient place to keep stuff; so it doesn't need a login shell or a
 password.
 
 Switch to the _termbox_ account and create a `bin` directory in its
-home-dir.
+home directory:
 
     $ sudo su termbox
     $ cd ~
@@ -355,7 +368,7 @@ as the user's home directory, and the `-M` switch instructs it *not*
 to create the home-directory. We don't really need a home directory
 for the _ttyS0_ account, since picocom will not read or write any
 files; but we provide one, regardless, because *some* systems need a
-valid home-directory to cd-into on login (else they choke). We could
+valid home directory to `cd` into on login (else they choke). We could
 as well have used `/` as the home directory, or we could have let
 useradd create the usual `/home/ttyS0`.
 
@@ -446,3 +459,24 @@ To see if your binary has been compiled with custom baudrate support,
 and / or if it has detected the `NO_CUSTOM_BAUD` variable, run it with
 the **--help** option, and take a look at the first few lines of
 output.
+
+## Contributing
+
+### Reporting bugs
+
+Open bug reports in the [issue tracker for this repository][issues].
+
+[issues]: https://github.com/picocom-ng/picocom/issues
+
+### Contributing features
+
+Please feel free to open pull requests for new features! Pull requests
+are expected to pass any automated checks, and must include both tests
+and documentation.
+
+## Authors
+
+Picocom was originally written by Nick Patavalis. This fork is
+maintained by Lars Kellogg-Stedman, <lars@oddbit.com>. For a complete
+list of contributors, see `git log`.
+
