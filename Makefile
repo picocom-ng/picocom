@@ -102,3 +102,7 @@ realclean: distclean
 	rm -f picocom.1.html
 	rm -f picocom.1.pdf
 	rm -f CHANGES
+
+smoketest: picocom
+	bats tests/smoke
+

@@ -1,0 +1,27 @@
+name: Smoke tests
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        distro: [fedora, ubuntu]
+    name: Build and test
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/picocom-ng/picocom-builder-${{ matrix.distro }}:main
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build
+        run: |
+          make
+
+      - name: Run tests
+        run: |
+          make smoketest
