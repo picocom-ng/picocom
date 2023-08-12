@@ -68,24 +68,17 @@ custbaud.o : custbaud.c custbaud.h
 doc : picocom.1.html picocom.1 picocom.1.pdf
 
 picocom.1 : picocom.1.md
-	sed 's/\*\*\[/\*\*/g;s/\]\*\*/\*\*/g' $? \
-	| pandoc -s -t man \
+	pandoc -s -t man \
 	    -Vfooter="Picocom $(VERSION)" \
 	    -Vadjusting='l' \
 	    -Vhyphenate='' \
-	    -o $@
+	    -o $@ $?
 
 picocom.1.html : picocom.1.md
 	pandoc -s -t html \
-	    --self-contained \
-	    -Vversion="v$(VERSION)" -Vdate="`date -I`" \
+	    --embed-resources --standalone \
+	    -Vversion="v$(VERSION)" \
 	    -o $@ $?
-
-#	Author is using custom templates, not included in repo
-#	    --template ~/.pandoc/tmpl/manpage.html \
-#	    -c ~/.pandoc/css/normalize-noforms.css \
-#	    -c ~/.pandoc/css/manpage.css \
-#
 
 picocom.1.pdf : picocom.1
 	groff -man -Tpdf $? > $@

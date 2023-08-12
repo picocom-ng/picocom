@@ -16,8 +16,8 @@ picocom - minimal dumb-terminal emulation program
 
 # DESCRIPTION
 
-As its name suggests, **picocom(1)** is a minimal dumb-terminal
-emulation program. It is, in principle, very much like **minicom(1)**,
+As its name suggests, `picocom(1)` is a minimal dumb-terminal
+emulation program. It is, in principle, very much like `minicom(1)`,
 only it's "pico" instead of "mini"! It was designed to serve as a
 simple, manual, modem configuration, testing, and debugging tool. It
 has also served (quite well) as a low-tech serial communications
@@ -32,9 +32,9 @@ system console, etc).
 
 When picocom starts it opens the tty (serial port) given as its
 non-option argument (or the *last* non-option argument, if multiple
-are given). Unless the **--noinit** option is given, it configures the
+are given). Unless the `--noinit` option is given, it configures the
 port to the settings specified by the option-arguments (or to some
-default settings), and sets it to "raw" mode. If **--noinit** is
+default settings), and sets it to "raw" mode. If `--noinit` is
 given, the initialization and configuration is skipped; the port is
 just opened. Following this, if standard input is a tty, picocom sets
 the tty to raw mode. Then it goes in a loop where it listens for input
@@ -46,13 +46,13 @@ the escape character is seen, then instead of sending it to the
 serial-device, the program enters "command mode" and waits for the
 next character (which is called the "function character"). Depending
 on the value of the function character, picocom performs one of the
-operations described in the **[COMMANDS]** section below.
+operations described in the [COMMANDS](#commands) section below.
 
 
 # COMMANDS
 
 Commands are given to picocom by first keying the *escape character*
-which by default is **Control-a** (see **[OPTIONS]** below for how to
+which by default is **Control-a** (see [OPTIONS](#options) below for how to
 change it), and then keying one of the function (command) characters
 shown here. From now on, we will use **C-\<key\>** as a short version
 of **Control-\<key\>**, so the default escape character is then
@@ -165,21 +165,21 @@ of **Control-\<key\>**, so the default escape character is then
 
 **C-s**
 
-:   Send (upload) a file. See **[SENDING AND RECEIVING FILES]**
-    below.
+:   Send (upload) a file. See [SENDING AND RECEIVING
+    FILES](#sending-and-receiving-files) below.
 
 **C-r**
 
-:   Receive (download) a file. See **[SENDING AND RECEIVING FILES]**
-    below.
+:   Receive (download) a file. See [SENDING AND RECEIVING
+    FILES](#sending-and-receiving-files) below.
 
-**C-v**
+**<a id="c-v">C-v</a>**
 
 :   Show program options (like baud rate, data bits, etc) as well as
-    the actual serial port settings. Only the options and port
-    settings that can be modified online (through commands) are shown,
-    not those that can only be set at the command-line. See
-    **[DISPLAY OF OPTIONS AND PORT SETTINGS]** for details.
+    the actual serial port settings. Only the options and port settings that
+    can be modified online (through commands) are shown, not those that can
+    only be set at the command-line. See [DISPLAY OF OPTIONS AND PORT
+    SETTINGS](#display-of-options-and-port-settings) for details.
 
 **C-h** or **C-k**
 
@@ -319,34 +319,38 @@ Picocom accepts the following command-line options.
 :   Specifies the external program (and any arguments to it) that will
     be used for transmitting files. If the argument to **--send-cmd**
     is the empty string (''), the send-file command is disabled. See
-    **[SENDING AND RECEIVING FILES]**. (Default: **sz -vv**)
+    [SENDING AND RECEIVING FILES](#sending-and-receiving-files). (Default: `sz
+    -vv`)
 
 **--receive-cmd** | **-v**
 
 :   Specifies the external program (and any arguments to it) that will
     be used for receiving files. If the argument to **--receive-cmd**
     is the empty string (''), the receive-file command is
-    disabled. See **[SENDING AND RECEIVING FILES]**. (Default: **rz
-    -vv**)
+    disabled. See [SENDING AND RECEIVING FILES](#sending-and-receiving-files).
+    (Default: `rz -vv`)
 
 **--imap**
 
 :   Specifies the input character map (i.e. special characters to be
     replaced when read from the serial port). See
-    **[INPUT, OUTPUT, AND ECHO MAPPING]**. (Default: Empty)
+    [INPUT, OUTPUT, AND ECHO MAPPING](#input-output-and-echo-mapping).
+    (Default: Empty)
 
 **--omap**
 
 :   Specifies the output character map (i.e. special characters to be
     replaced before being written to serial port). See
-    **[INPUT, OUTPUT, AND ECHO MAPPING]**. (Default: Empty)
+    [INPUT, OUTPUT, AND ECHO MAPPING](#input-output-and-echo-mapping).
+    (Default: Empty)
 
 **--emap**
 
 :   Specifies the local-echo character map (i.e. special characters to
     be replaced before being echoed-back to the terminal, if
     local-echo is enabled). See
-    **[INPUT, OUTPUT, AND ECHO MAPPING]**. (Default: **delbs,crcrlf**)
+    [INPUT, OUTPUT, AND ECHO MAPPING](#input-output-and-echo-mapping).
+    (Default: `delbs,crcrlf`)
 
 **--logfile** | **-g**
 
@@ -503,7 +507,7 @@ assuming that neither the **--noinit**, nor the **--quiet** command
 line options have been given), the port settings are silently
 checked. If any mismatch is detected between the requested and the
 actual port settings, a warning message is displayed. You may then use
-the **[C-v]** command to determine the exact mismatch or mismatches.
+the [C-v](#c-v) command to determine the exact mismatch or mismatches.
 
 # SENDING AND RECEIVING FILES
 
@@ -535,8 +539,9 @@ and the "receive" commands you can invoke picocom like this:
 
     picocom --send-cmd '' --receive-cmd '' ...
 
-A picocom session with both, the send- and the receive-file commands
-disabled does not **fork(2)** and does not run any external programs.
+A picocom session with both the **send-cmd** and the **receive-cmd**
+options disabled does not **fork(2)** and does not run any external
+programs.
 
 During the picocom session, if you key the "send" or "receive"
 commands (e.g. by pressing **C-a**, **C-s**, or **C-a**, **C-r**) you
@@ -614,7 +619,6 @@ will:
 - Replace every CR character with CR and LF when echoing to the
   terminal (if local-echo is enabled).
 
-
 # EXITING PICOCOM
 
 This section summarizes the conditions in which picocom terminates its
@@ -671,18 +675,15 @@ operation and what happens in each such condition:
   modem control lines are cleared, and picocom exits with a failure
   status.
 
-
 # AUTHOR
 
 Picocom was originally written by Nick Patavalis. This fork is
 maintained by Lars Kellogg-Stedman, <lars@oddbit.com>.
 
-
 # AVAILABILITY
 
 Download the latest release from:
 <https://github.com/picocom-ng/picocom>.
-
 
 # COPYRIGHT
 
