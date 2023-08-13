@@ -298,6 +298,24 @@ int tty_write_sz;
 
 /**********************************************************************/
 
+int
+pinfo(const char *format, ...)
+{
+    va_list args;
+    int len;
+
+    if ( opts.quiet ) {
+        return 0;
+    }
+    va_start(args, format);
+    len = fd_vprintf(STO, format, args);
+    va_end(args);
+
+    return len;
+}
+
+/**********************************************************************/
+
 #ifdef UUCP_LOCK_DIR
 
 /* use HDB UUCP locks  .. see
@@ -639,22 +657,6 @@ read_hex (unsigned char *buff, int sz)
 #endif /* of ifndef LINENOISE */
 
 /**********************************************************************/
-
-int
-pinfo(const char *format, ...)
-{
-    va_list args;
-    int len;
-
-    if ( opts.quiet ) {
-        return 0;
-    }
-    va_start(args, format);
-    len = fd_vprintf(STO, format, args);
-    va_end(args);
-
-    return len;
-}
 
 void
 cleanup (int drain, int noreset, int hup)
