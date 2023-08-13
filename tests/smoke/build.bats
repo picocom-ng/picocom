@@ -4,6 +4,12 @@ setup() {
 	read ptyname ptypid < <("${BATS_TMPDIR}/fakeserial")
 }
 
+@test "picocom builds successfully with features disabled" {
+	for feature in CONFIGFILE HIGH_BAUD USE_FLOCK LINENOISE HELP; do
+		make realclean all FEATURE_${feature}=0
+	done
+}
+
 @test "picocom builds successfully" {
 	make realclean all
 }
