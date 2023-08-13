@@ -29,6 +29,9 @@ FEATURE_SANITIZE ?= 0
 VERSION = $(shell git describe --long)
 -include version.mk
 
+PANDOC ?= pandoc
+HTMLDOC ?= htmldoc
+
 #CC ?= gcc
 CPPFLAGS += -DVERSION_STR=\"$(VERSION)\" $(EXTRA_CPPFLAGS)
 CFLAGS += -Wall -g $(EXTRA_CFLAGS)
@@ -112,7 +115,7 @@ picocom : $(OBJS)
 doc : picocom.1.html picocom.1 picocom.1.pdf
 
 picocom.1 : picocom.1.md
-	pandoc -s -t man \
+	$(PANDOC) -s -t man \
 	    -Vfooter="Picocom $(VERSION)" \
 	    -Vadjusting='l' \
 	    -Vhyphenate='' \
@@ -121,13 +124,13 @@ picocom.1 : picocom.1.md
 picocom.1.html : picocom.1.md
 	# modern pandoc wants --embed-resources --standalone, but
 	# pandoc in github ci is too old.
-	pandoc -s -t html \
+	$(PANDOC) -s -t html \
 	    --standalone \
 	    -Vversion="v$(VERSION)" \
 	    -o $@ $<
 
 picocom.1.pdf : picocom.1.html
-	htmldoc -f $@ $<
+	$(HTMLDOC) -f $@ $<
 
 clean:
 	rm -f $(OBJS) $(COVS) $(TEST_OBJS) $(TEST_COVS)
