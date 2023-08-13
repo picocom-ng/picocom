@@ -1,0 +1,22 @@
+name: Pre-commit
+
+on:
+  pull_request:
+  push:
+    branches-ignore: main
+
+jobs:
+  pre-commit:
+    name: Run Picocom pre-commit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+
+      - name: Run pre-commit checks
+        uses: pre-commit/action@v3.0.0
