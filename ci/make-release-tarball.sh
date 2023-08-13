@@ -6,8 +6,8 @@ version=$1
 ref="${2:-HEAD}"
 
 if [[ -z ${version} ]]; then
-	echo "ERROR: no version provided on command line" >&2
-	exit 1
+    echo "ERROR: no version provided on command line" >&2
+    exit 1
 fi
 
 tmpdir=$(mktemp -d releaseXXXXXX)

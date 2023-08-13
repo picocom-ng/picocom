@@ -70,7 +70,7 @@ function _picocom_split_line()
     #              ` (backquote)
     #              D (delimiter)
     #              W (naked word)
-    #    
+    #
     # ", ${, and $( can nest inside each-other any number of times
 
     wbreaks=$delimiters$separators
@@ -143,7 +143,7 @@ function _picocom_split_line()
                 c=$c1
             elif [[ $c == '`' ]]; then
                 stack+=( W )
-                state=$c                
+                state=$c
             elif [[ $c == '$' && ( $c1 == '(' || $c1 == '{' ) ]]; then
                 let i++
                 word+=$c
@@ -277,7 +277,7 @@ _picocom()
     local cur cur0 cur1 prev
     local -a words opts baudrates mappings mapfilt
     local DEBUG=/dev/null
-    
+
     opts=( --baud --flow --databits --stopbits --parity \
            --lower-rts --lower-dtr --raise-rts --raise-dtr \
            --imap --omap --emap
@@ -336,7 +336,7 @@ _picocom()
         -y | --parity)
             COMPREPLY=( $(compgen -W "even odd none" -- "$cur") )
             return 0
-            ;;        
+            ;;
         -I | --imap | -O | --omap | -E | --emap )
             _picocom_filter_mappings || return 0
             cur1=${cur##*[, $'\t']}

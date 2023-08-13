@@ -16,9 +16,9 @@ Test environment
 - macOS 10.12 Sierra (native on Macbook Pro)
 - Kubuntu 16.04 (native on Macbook Pro)
 - all above on Intel x86 64 Bit
-  
+
 - Cygwin 5.1 on Windows XP 32 Bit host
-  
+
 - Ftdi FT232R, max 1MBaud (chip can 3MBaud, but hw rs232 level shifter
   is specified for just 1MBaud)
 - Prolific PL2303, max 230kBaud (chip can 12MBaud, but hw rs232 level
@@ -128,4 +128,3 @@ Dragonfly
   /dev/ttyU0: Invalid argument".
 - Custom baudrates with Prolific adapter has the same issue as in
   FreeBsd.
-
