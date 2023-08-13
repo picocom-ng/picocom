@@ -10,7 +10,7 @@ setup() {
     done
 }
 
-@test "picocom builds successfully" {
+@test "picocom builds successfully with default configuration" {
     make realclean all
 }
 

@@ -65,7 +65,7 @@ ifeq ($(FEATURE_LINENOISE),1)
 HISTFILE = .picocom_history
 CPPFLAGS += -DHISTFILE=\"$(HISTFILE)\" \
 	    -DLINENOISE
-SRCS += linenoise-1.0/linenoise.c
+SRCS += linenoise.c
 endif
 
 ## Comment this in to enable (force) custom baudrate support
@@ -90,6 +90,8 @@ DEPS = $(SRCS:.c=.d)
 NODEPS = clean distclean realclean doc
 SUFFIXES += .d
 COVS = $(SRCS:.c=.gcda) $(SRCS:.c=.gcno)
+
+VPATH ?= linenoise-1.0
 
 TEST_SRCS = test_picocom.c test_configfile.c test_split.c test_options.c
 TEST_OBJS = $(TEST_SRCS:.c=.o)
