@@ -109,19 +109,19 @@ TEST_COVS = $(TEST_SRCS:.c=.gcda) $(TEST_SRCS:.c=.gcno)
 
 all: picocom
 
-picocom : $(OBJS)
+picocom: $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
 
-doc : picocom.1.html picocom.1 picocom.1.pdf
+doc: picocom.1.html picocom.1 picocom.1.pdf
 
-picocom.1 : picocom.1.md
+picocom.1: picocom.1.md
 	$(PANDOC) -s -t man \
 	    -Vfooter="Picocom $(VERSION)" \
 	    -Vadjusting='l' \
 	    -Vhyphenate='' \
 	    -o $@ $<
 
-picocom.1.html : picocom.1.md
+picocom.1.html: picocom.1.md
 	# modern pandoc wants --embed-resources --standalone, but
 	# pandoc in github ci is too old.
 	$(PANDOC) -s -t html \
@@ -129,11 +129,12 @@ picocom.1.html : picocom.1.md
 	    -Vversion="v$(VERSION)" \
 	    -o $@ $<
 
-picocom.1.pdf : picocom.1.html
+picocom.1.pdf: picocom.1.html
 	$(HTMLDOC) -f $@ $<
 
 clean:
 	rm -f $(OBJS) $(COVS) $(TEST_OBJS) $(TEST_COVS)
+	rm -f fakeserial fakeserial.o
 	rm -f test_picocom.log test_picocom.tap
 	rm -rf coverage
 	rm -f *~
@@ -149,8 +150,8 @@ realclean: distclean
 	rm -f picocom.1.pdf
 	rm -f CHANGES
 
-smoketest: picocom
-	bats tests/smoke
+smoketest: realclean picocom fakeserial
+	export MAKE=$(MAKE) MAKEFILE=$(firstword $(MAKEFILE_LIST)); bats tests/smoke
 
 ifeq (,$(findstring $(MAKECMDGOALS),$(NODEPS)))
 -include $(DEPS) $(TEST_DEPS)
@@ -160,9 +161,13 @@ endif
 # use gcc-specific flags. This allows us to compile with
 # clang (e.g. on FreeBSD).
 ISGCC = $(shell $(CC) -v 2>&1 | grep -c gcc.version)
+DISTID = $(shell . /etc/os-release; echo $$ID)
 
 test_picocom: CPPFLAGS += -DTESTING
-test_picocom: LDLIBS += -lcheck -lsubunit -lm
+test_picocom: LDLIBS += -lcheck -lm
+ifeq ($(DISTID), ubuntu)
+test_picocom: LDLIBS += -lsubunit
+endif
 ifeq ($(FEATURE_COVERAGE),1)
 test_picocom: CFLAGS+=-fprofile-arcs -ftest-coverage
 test_picocom: LDLIBS+=-lgcov
