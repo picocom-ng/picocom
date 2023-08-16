@@ -1,17 +1,24 @@
+_make() {
+    ${MAKE} -f ${MAKEFILE} "$@"
+}
+
 setup() {
     BATS_TMPDIR="$(mktemp -d batsXXXXXX)"
-    gcc -o "${BATS_TMPDIR}/fakeserial" tests/smoke/fakeserial.c
-    read ptyname ptypid < <("${BATS_TMPDIR}/fakeserial")
+    MAKE=${MAKE:-make}
+    MAKEFILE=${MAKEFILE:=Makefile}
+
+    _make fakeserial
+    read ptyname ptypid < <(./fakeserial)
 }
 
 @test "picocom builds successfully with features disabled" {
     for feature in CONFIGFILE HIGH_BAUD USE_FLOCK LINENOISE HELP; do
-        make realclean all FEATURE_${feature}=0
+        _make distclean all FEATURE_${feature}=0
     done
 }
 
 @test "picocom builds successfully with default configuration" {
-    make realclean all
+    _make distclean all FEATURE_${feature}=0
 }
 
 @test "picocom runs --help successfully" {

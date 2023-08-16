@@ -1,10 +1,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <pty.h>
 #include <limits.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <termios.h>
+
+#if defined(__linux__)
+#include <pty.h>
+#elif defined(__FreeBSD__)
+#include <libutil.h>
+#endif
 
 int main(int argc, char *argv[]) {
     int porta, portb;
