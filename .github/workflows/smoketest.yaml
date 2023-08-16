@@ -8,17 +8,16 @@ permissions:
   contents: read
 
 jobs:
-  build-and-test:
+  run-tests-linux:
+    name: Run picocom smoke tests on Linux
     strategy:
       matrix:
         distro: [fedora, ubuntu]
-    name: Run picocom smoke tests
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/picocom-ng/picocom-builder-${{ matrix.distro }}:main
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Build
         run: |
@@ -27,3 +26,48 @@ jobs:
       - name: Run tests
         run: |
           make smoketest
+
+  run-tests-freebsd:
+    name: Run picocom smoke tests on FreeBSD
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate ssh key
+        run: |
+          set -e
+          mkdir sshkeys
+          ssh-keygen -f sshkeys/testing_rsa -N '' -t rsa -b 4096
+          mv sshkeys/testing_rsa.pub sshkeys/authorized_keys
+
+      - name: Boot FreeBSD
+        run: |
+          docker run -d --rm --name freebsd \
+            -p 2200:22 \
+            -v $PWD/sshkeys:/shared \
+            ghcr.io/larsks/freebsd-container:main
+
+      - name: Wait for vm
+        run: |
+          timeout 60 \
+            sh -c '
+              while ! ssh -i sshkeys/testing_rsa -o stricthostkeychecking=no -p 2200 freebsd@localhost true; do
+                sleep 1
+              done
+            '
+
+      - name: Copy source into vm
+        run: |
+          rsync -a -e 'ssh -i sshkeys/testing_rsa -p 2200' . freebsd@localhost:picocom/
+
+      - name: Install dependencies
+        run: |
+          ssh -i sshkeys/testing_rsa -p 2200 freebsd@localhost sudo pkg install -y \
+            check \
+            libconfuse \
+            gmake \
+            bats-core
+
+      - name: Run tests
+        run: |
+          ssh -i sshkeys/testing_rsa -p 2200 freebsd@localhost gmake -C picocom -f Makefile.bsd smoketest
