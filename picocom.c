@@ -1553,7 +1553,7 @@ show_usage(char *name)
     s = strrchr(name, '/');
     s = s ? s+1 : name;
 
-    printf("picocom v%s\n", VERSION_STR);
+    printf("picocom version %s\n", VERSION_STR);
 
     printf("\nCompiled-in options:\n");
     printf("  TTY_Q_SZ is %d\n", TTY_Q_SZ);
@@ -1972,7 +1972,7 @@ parse_args(int argc, char *argv[])
 
 void show_config() {
 #ifndef NO_HELP
-    printf("picocom v%s\n", VERSION_STR);
+    printf("picocom version %s\n", VERSION_STR);
     printf("\n");
     printf("port is        : %s\n", opts.port);
     printf("flowcontrol    : %s\n", flow_str[opts.flow]);
