@@ -26,7 +26,7 @@ FEATURE_COVERAGE ?= 0
 # Set this to 1 to enable address sanitization checks.
 FEATURE_SANITIZE ?= 0
 
-VERSION = $(shell git describe --long)
+VERSION := $(shell git describe --long || echo "dev")
 -include version.mk
 
 PANDOC ?= pandoc
