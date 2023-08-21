@@ -104,7 +104,7 @@ You can run Picocom from the [official container image]. If you have
 `/dev/ttyUSB2` at 115200 bps, you would run:
 
 [podman]: https://podman.io
-[official container image]: https://github.com/orgs/picocom-ng/packages?repo_name=picocom
+[official container image]: https://github.com/picocom-ng/picocom/pkgs/container/picocom
 
 ```
 podman run --rm -it --device /dev/ttyUSB2 --group-add keep-groups \
