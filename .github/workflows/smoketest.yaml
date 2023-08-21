@@ -1,8 +1,16 @@
 name: Smoke tests
 on:
   pull_request:
+    paths:
+      - "**.[ch]"
+      - Makefile
+      - "**.bats"
   push:
     branches-ignore: main
+    paths:
+      - "**.[ch]"
+      - Makefile
+      - "**.bats"
 
 permissions:
   contents: read

@@ -1,8 +1,14 @@
 name: Unit tests
 on:
   pull_request:
+    paths:
+      - "**.[ch]"
+      - Makefile
   push:
     branches-ignore: main
+    paths:
+      - "**.[ch]"
+      - Makefile
 
 jobs:
   run-tests-linux:
