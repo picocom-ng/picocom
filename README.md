@@ -50,7 +50,9 @@ Please feel free to send comments, requests for new features (no
 promises, though!), bug-fixes and rants, to the author's email
 address shown at the top of this file.
 
-## Compilation / Installation
+## Installing picocom
+
+### Building from source
 
 Change into picocom's source directory and say:
 
@@ -94,6 +96,30 @@ system. For example:
 
 Alternatively, you might have to make some trivial edits to the
 Makefile for it to work with your system's make(1) command.
+
+### Using the container image
+
+You can run Picocom from the [official container image]. If you have
+[Podman] running in rootless mode, and you want to access port
+`/dev/ttyUSB2` at 115200 bps, you would run:
+
+[podman]: https://podman.io
+[official container image]: https://github.com/orgs/picocom-ng/packages?repo_name=picocom
+
+```
+podman run --rm -it --device /dev/ttyUSB2 --group-add keep-groups \
+  ghcr.io/picocom-ng/picocom:latest -b 115200 /dev/ttyUSB2
+```
+
+If you are running Podman as root:
+
+```
+podman run --rm -it --device /dev/ttyUSB2 \
+  ghcr.io/picocom-ng/picocom:latest -b 115200 /dev/ttyUSB2
+```
+
+And if you're running Docker, just replace `podman` in the above
+command line with `docker`.
 
 ## Using picocom
 
