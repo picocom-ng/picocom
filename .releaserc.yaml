@@ -6,6 +6,12 @@ plugins:
     - preset: conventionalcommits
   - - '@semantic-release/release-notes-generator'
     - preset: conventionalcommits
+  - - '@codedependant/semantic-release-docker'
+    - dockerRegistry: ghcr.io
+      dockerProject: picocom-ng
+      dockerImage: picocom
+      dockerTags: ['latest', '{{version}}', '{{major}}', '{{major}}.{{minor}}'],
+      dockerFile: Containerfile
   - - '@semantic-release/exec'
     - prepareCmd: bash ci/make-release-tarball.sh ${nextRelease.version}
   - - '@semantic-release/github'

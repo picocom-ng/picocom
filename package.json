@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@codedependant/semantic-release-docker": "^4.4.0",
     "@semantic-release/commit-analyzer": "github:semantic-release/commit-analyzer",
     "@semantic-release/exec": "github:semantic-release/exec",
     "conventional-changelog-conventionalcommits": "^6.1.0",
