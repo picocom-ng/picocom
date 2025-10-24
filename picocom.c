@@ -706,7 +706,7 @@ do_map (char *b, int map, char c)
         }
         break;
     case '\x08':
-        /* BS ma-pings */
+        /* BS mappings */
         if ( map & M_BSDEL ) {
             b[0] = '\x7f'; n = 1;
         }
